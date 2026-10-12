@@ -26,7 +26,9 @@ assert len(sessions['sessions']) == 5 and sessions['total'] >= 31
 session = call('/api/sites/demo_store/sessions/'+event['session_id']+'/events')
 assert len(session['events']) == 1 and session['events'][0]['page_url'] == 'http://localhost:5174/'
 assert len(call('/api/sites')['sites']) >= 1
-assert len(call('/api/sites/demo_store/pages')['pages']) == 3
+pages = call('/api/sites/demo_store/pages')['pages']
+assert len(pages) >= 15
+assert any('/products/aurora-headphones.html' in page['page_url'] for page in pages)
 heat = call('/api/sites/demo_store/heatmap?url=http%3A%2F%2Flocalhost%3A5174%2F')
 assert heat['total_clicks'] > 0 and len(heat['clicks']) > 0
 print('PASS: all live curl assertions')

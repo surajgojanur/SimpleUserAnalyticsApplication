@@ -122,3 +122,10 @@ The new extension request takes precedence over the earlier finished milestone. 
 ### Remaining work / continuation
 - Historical seed implementation and simulator are in progress. Seed test/run already passed but still needs its own commit/progress evidence. Simulator pilot initially stalled on Playwright keepalive lifecycle completion after navigation; fixed simulator forwarding/waits without changing the tracker; rerun is in progress.
 - Finish simulator pilot and 40-session run; rerun existing browser scripts (stop API before tracker script), API/test/build/lint/format checks; capture dashboard screenshots in docs/screenshots; document flags/generator/seed semantics/deployment; verify a fresh clone; commit remaining steps.
+
+### Historical funnel seed completed
+- `npm run seed -- --reset` in apps/api: 30 historical sessions / 436 events inserted.
+- Immediate `npm run seed`: 0 inserts. Stable site/origin/event UUIDs and $setOnInsert make repeat seeding idempotent; --reset still deletes only demo_store events before regeneration. Different primary origins use a separate seed ID namespace. Site allowed origins are updated every run.
+- API unit suite expanded from 39 to 41 passing tests: all 15 real paths, 30→21→12→5→2 funnel, desktop/mobile clicks, valid event schema, stable IDs, past timestamps. No runtime API/model/tracker changes.
+- Hotspots vary by page type and device; historical art/layout positions are approximate. Seed alone supplies past timestamps; simulator uses actual tracker timestamps.
+- Live curl smoke adapted from exactly 3 pages to at least 15 actual page paths: passed all original endpoint/status/count/normalization checks.
