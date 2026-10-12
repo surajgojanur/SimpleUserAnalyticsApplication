@@ -257,8 +257,10 @@ try {
     } catch {}
     renderCart();
   });
-  if (document.querySelector('#checkout-summary')) {
-    document.querySelector('#checkout-summary').innerHTML = cart.length
+  function renderCheckout() {
+    const checkoutSummary = document.querySelector('#checkout-summary');
+    if (!checkoutSummary) return;
+    checkoutSummary.innerHTML = cart.length
       ? cart
           .map(
             (line) =>
@@ -294,15 +296,22 @@ try {
     } catch {}
   }
   window.addEventListener('storage', (event) => {
-    if (event.key === cartKey) {
-      cart = loadCart(storage, products).cart;
+    if (event.key === cartKey || event.key === 'northwind-goods:promo' || event.key === null) {
+      const loaded = loadCart(storage, products);
+      cart = loaded.cart;
+      if (loaded.error) notify(loaded.error);
+      try {
+        promo = storage.getItem('northwind-goods:promo') === 'DEMO10' ? 'DEMO10' : '';
+      } catch {}
       count();
       renderCart();
+      renderCheckout();
     }
   });
   count();
   filterCards();
   renderCart();
+  renderCheckout();
   document.body.dataset.ready = 'true';
 } catch (error) {
   notify(`The demo collection could not load. Please reload. ${error.message}`);

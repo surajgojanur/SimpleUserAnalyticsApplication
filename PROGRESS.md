@@ -138,3 +138,15 @@ The new extension request takes precedence over the earlier finished milestone. 
 - Valid CLI flags, bounds, local-only URLs, seeded persona choices, rate-gate serialization/backoff tested. Browser launch/download stays project-local via PLAYWRIGHT_BROWSERS_PATH.
 
 Next: full 40-session workload, dashboard screenshots/evidence, documentation and fresh clone. The original API is running again on 5000.
+
+### Full simulator workload and dashboard verified
+- `npm run simulate --prefix apps/demo-site -- --sessions 40 --seed 42` (default concurrency 3): all 40 visits completed; buyer 7, researcher 11, mobile 8, abandoner 8, bounce 6. Accepted/stored 667 events: 224 views + 443 clicks. Three intentional rotations yielded 43 tracker sessions. Zero failed sessions, zero 429s, observed peak 160/minute.
+- Queried MongoDB by every reported session ID and all 43 API journeys: exact event counts, actual timestamps close to received_at, normalized URLs and bounded document coordinates passed. Event counts range 1–36. Committed compact evidence is docs/simulation-report.json; raw log is ignored verification/artifacts/simulation-40.log.
+- Executed `--headed --base-url http://localhost:5174 --sessions 1 --concurrency 1 --seed 7`: one mobile bounce, one accepted event, no errors/429s; graphical Chromium actually launched.
+- `node verification/shopper-dashboard.mjs`: 89 total sessions at capture, 15 page URLs, a 36-event/11-view journey matched API ordering/types/counts. Product heatmap had 80 clicks, both desktop/mobile, correct canvas pixel scaling and tall canvas; mobile dashboard width fit, no console/page errors. Screenshots sessions/journey/product-heatmap saved and visually inspected.
+- Existing dashboard regression first failed a live-count comparison (18 vs 20) because purchase QA was simultaneously updating that session. Re-ran with no concurrent ingestion: passed every original loading/empty/error, pagination, journey and canvas assertion. This was verification scheduling, not a dashboard defect. No dashboard runtime changes were needed.
+
+### Quality review: cart synchronization fix
+- Reproduced an open checkout showing $129 and enabled Place order after another tab cleared its bag; header count correctly became zero but checkout summary stayed stale.
+- Extracted renderCheckout and refresh both summary and enabled state on cart/promo/clear storage events; errors from invalid stored cart also remain visible. Added desktop/mobile two-tab browser regression for quantity $24→$48, discount $43.20, and empty/disabled checkout.
+- Rerun `node verification/store-browser.mjs`: desktop/mobile purchases, cross-tab updates and empty state, all 15 pages, no offsite/form requests or console/page errors passed. Demo unit tests 5/5, root lint and format passed.

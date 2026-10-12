@@ -187,6 +187,26 @@ try {
     await page.waitForURL('**/checkout.html');
     await ready(page);
     assert.match(await page.locator('#checkout-summary').innerText(), /\$24\.00/);
+    // A second tab must update an open checkout, including its empty state.
+    const otherTab = await context.newPage();
+    await otherTab.goto('http://localhost:5174/cart.html');
+    await ready(otherTab);
+    await otherTab.locator('[data-cart-step="1"]').click();
+    await page.waitForFunction(() =>
+      document.querySelector('#checkout-summary').textContent.includes('$48.00'),
+    );
+    await otherTab.fill('#promo', 'DEMO10');
+    await otherTab.click('#apply-promo');
+    await page.waitForFunction(() =>
+      document.querySelector('#checkout-summary').textContent.includes('$43.20'),
+    );
+    await otherTab.locator('[data-remove]').click();
+    await page.waitForFunction(() => document.querySelector('#place-order').disabled);
+    assert.match(await page.locator('#checkout-summary').innerText(), /Your bag is empty/);
+    await otherTab.close();
+    await page.goto('http://localhost:5174/products/ceramic-mug.html');
+    await ready(page);
+    await page.click('#add-to-cart');
     await page.goto('http://localhost:5174/cart.html');
     await ready(page);
     await page.locator('[data-remove]').click();
