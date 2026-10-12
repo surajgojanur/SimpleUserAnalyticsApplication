@@ -48,8 +48,11 @@
             maxlength="60"
           /><button id="search-button" aria-label="Search">⌕</button>
         </form>
-        <a class="cart-link" href="/cart.html" aria-label="Cart"
-          >Bag <span data-cart-count aria-live="polite">0</span></a
+        <a class="cart-link" href="/cart.html" aria-label="Cart">
+          <svg class="bag-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5 8h14l1 13H4L5 8ZM8 9V6a4 4 0 0 1 8 0v3" />
+          </svg>
+          <span data-cart-count aria-live="polite">0</span></a
         >
       </div>
     </header>
@@ -76,7 +79,7 @@
         </div>
         <div>
           <h2>A little reassurance</h2>
-          <p>Fictional free delivery over $75.</p>
+          <p>Fictional free delivery.</p>
           <p>Demo returns within 30 days.</p>
           <p>No payments or personal information.</p>
         </div>

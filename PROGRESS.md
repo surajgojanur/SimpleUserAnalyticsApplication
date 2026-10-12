@@ -157,3 +157,6 @@ Next: full 40-session workload, dashboard screenshots/evidence, documentation an
 - Original root checks rerun: 41 API + 5 demo tests passed; lint, format and tracker/dashboard/demo builds passed. Generated tracker remained byte-identical. Live curl smoke passed all ingestion/query/status assertions. Secret scanner covered 14 commits/153 unique text blobs with no recognized secrets or tracked env/dependencies.
 
 Continuation: documentation is ready for fresh-clone verification. Clone into project-local .cache/store-fresh-clone, install exactly per README (including demo/verification/browser), stop original processes before claiming ports 5000/5173/5174, preserve current simulation data by seeding without reset, run simulator/store/dashboard/API/quality checks. Record actual results, restore original local services, scan and commit final evidence. Do not repeat the completed 40-session run.
+
+### Final storefront checklist adjustment
+- Replaced the header’s text-only bag control with a local inline SVG bag icon and the existing live count, retaining its accessible Cart label and selectors. Corrected footer delivery copy to match the always-free fake checkout. Regenerated all pages; generator/cart/simulator unit tests 5/5, lint and formatting passed. Remaining clone-local browser checks will verify responsive layout after this small adjustment.
