@@ -19,3 +19,12 @@ The complete 34-page PDF in docs was read before writing code. The assignment wi
 
 ## Continuation
 Read this file and git log first. Run only checks appropriate to the current phase; do not repeat completed implementation. Local ignored .env files use synthetic/local settings. Deployment and public GitHub publication require human accounts and credentials and will be documented as MANUAL STEPS.
+
+## Phase 1 completed
+- `npm run seed -- --reset`: 30 synthetic sessions, 310 events.
+- `npm start`: API listening on port 5000; existing MongoDB on 27017 successfully connected. Requested Podman startup failed with address in use; used the existing instance as permitted.
+- `python3 verification/api-smoke.py`: curl verified health, ingestion 202, duplicate 200, invalid 400, unknown site 404, forbidden Origin 403, five-session pagination/counts, normalized session event, sites, three pages, populated heatmap.
+- Added initialization of unique index before serving traffic, deterministic aggregation tie ordering, HTTP(S) URL normalization at ingestion, and configurable proxy trust (local 0, Render 1).
+- npm audit detected development dependency advisories; resolve during quality phase before final verification.
+
+Next: phase 2 tracker/demo. API process currently running; local MongoDB is available. No external credentials needed for local work.
