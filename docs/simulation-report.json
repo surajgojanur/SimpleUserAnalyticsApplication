@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "sessions": 40,
+  "personas": {
+    "buyer": 7,
+    "researcher": 11,
+    "mobile": 8,
+    "abandoner": 8,
+    "bounce": 6
+  },
+  "accepted": 667,
+  "rateLimited": 0,
+  "failed": 0,
+  "rotated": 3,
+  "peakRequestsPerMinute": 160,
+  "trackerSessions": 43,
+  "storedEvents": 667,
+  "pageViews": 224,
+  "clicks": 443,
+  "minEvents": 1,
+  "maxEvents": 36,
+  "verified": "MongoDB counts, actual timestamps, coordinates and all 43 API journeys"
+}
