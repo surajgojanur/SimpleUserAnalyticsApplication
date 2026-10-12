@@ -150,3 +150,10 @@ Next: full 40-session workload, dashboard screenshots/evidence, documentation an
 - Reproduced an open checkout showing $129 and enabled Place order after another tab cleared its bag; header count correctly became zero but checkout summary stayed stale.
 - Extracted renderCheckout and refresh both summary and enabled state on cart/promo/clear storage events; errors from invalid stored cart also remain visible. Added desktop/mobile two-tab browser regression for quantity $24→$48, discount $43.20, and empty/disabled checkout.
 - Rerun `node verification/store-browser.mjs`: desktop/mobile purchases, cross-tab updates and empty state, all 15 pages, no offsite/form requests or console/page errors passed. Demo unit tests 5/5, root lint and format passed.
+
+### Documentation and deployment preparation
+- README now describes all 15 paths, product cents/cart/fake forms, generator and API-origin/CSP rewriting, all simulator flags/personas/local-only pacing and actual-vs-historical traffic, screenshots and new verification scripts.
+- Demo Vercel configuration runs npm ci / npm run build with DEMO_API_URL supplied as a build variable; cleanUrls remains false. Allowed origins still must be updated with DEMO_ORIGINS via local seed against Atlas. No hosted services/accounts were created.
+- Original root checks rerun: 41 API + 5 demo tests passed; lint, format and tracker/dashboard/demo builds passed. Generated tracker remained byte-identical. Live curl smoke passed all ingestion/query/status assertions. Secret scanner covered 14 commits/153 unique text blobs with no recognized secrets or tracked env/dependencies.
+
+Continuation: documentation is ready for fresh-clone verification. Clone into project-local .cache/store-fresh-clone, install exactly per README (including demo/verification/browser), stop original processes before claiming ports 5000/5173/5174, preserve current simulation data by seeding without reset, run simulator/store/dashboard/API/quality checks. Record actual results, restore original local services, scan and commit final evidence. Do not repeat the completed 40-session run.

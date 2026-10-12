@@ -17,21 +17,24 @@ A complete User Analytics hiring assignment for CausalFunnel: a one-tag JavaScri
 - Validated, idempotent ingestion with origin checks, 10 KB limit, future-time rejection, and rate limiting.
 - Paginated sessions with event counts, clickable chronological journeys, site selector, and page selector.
 - Canvas heat/dots modes, desktop/mobile filters, and loading/empty/error states.
-- Thirty seeded sessions with synthetic hotspots, MongoDB integration tests, and repeatable Chromium verification.
+- Northwind Goods: a fictional, responsive 15-page store with product galleries, persistent cart, and fake checkout.
+- Thirty idempotent historical sessions with funnel drop-off, plus a seeded Playwright shopper simulator driving the real tracker.
+- MongoDB integration tests, generator/cart/simulator unit tests, and repeatable desktop/mobile Chromium verification.
 
 ## Architecture
 
 ```text
 Any webpage + tracker.js ── POST /api/events ──► Express API ──► MongoDB
 React dashboard          ── GET /api/sites… ──► Express API ◄── MongoDB
-Demo Store (3 HTML pages) loads /sdk/tracker.js from the API
+Northwind Goods (15 static pages) loads /sdk/tracker.js from the API
+Playwright shopper personas click the store → real tracker → same API
 ```
 
 ```text
 apps/api/           Express, Mongoose models, validation, queries, seed, tests
 apps/api/public/    Committed esbuild tracker bundle, served at /sdk/tracker.js
 apps/dashboard/     React + Vite + Tailwind dashboard
-apps/demo-site/     Home, products, cart; long section for scroll verification
+apps/demo-site/     Product data, static generator, cart, fake checkout, traffic simulator
 packages/tracker/   Vanilla JavaScript tracker source and esbuild configuration
 verification/       Live curl, Chromium, and Git-history secret-pattern checks
 ```
@@ -94,7 +97,7 @@ npm run seed -- --reset
 cd ../..
 ```
 
-`--reset` deletes **only events for `demo_store`** before creating 30 new synthetic sessions. Without it, every run appends another 30 sessions. Both modes update the demo site's allowed origins. Run without `--reset` when preserving tracked demo events matters.
+`--reset` deletes **only events for `demo_store`** before creating 30 historical synthetic sessions (436 events). Without it, seeding is idempotent for the same primary origin: existing seed event IDs are preserved and only missing events are inserted. Both modes update the demo site’s allowed origins. Run without `--reset` to preserve tracked/simulated events. Changing the first `DEMO_ORIGINS` entry creates a separate seed namespace with that origin’s page URLs.
 
 API environment:
 
@@ -112,13 +115,16 @@ Origins include scheme and port, with **no path or trailing slash**. Open the de
 
 Install the API **from `apps/api`**, as shown: its `.npmrc` disables optional-peer resolution that crashes npm 10 with Vitest's optional devtools peers. Required dependencies are explicit, locked, audited, and tested.
 
-### 4. Install the dashboard and tracker
+### 4. Install the dashboard, tracker, and demo tooling
 
 ```bash
 cd apps/dashboard
 cp .env.example .env
 npm ci
 cd ../../packages/tracker
+npm ci
+npm run build
+cd ../../apps/demo-site
 npm ci
 npm run build
 cd ../..
@@ -174,7 +180,7 @@ npm run build
 python3 verification/secrets.py
 ```
 
-`npm test` runs the API suite; it needs MongoDB. Tests use a database ending in `_test` distinct from `MONGODB_URI`, clean it between cases, and drop it afterwards. Never use a production database as `MONGODB_TEST_URI`. Currently 39 tests cover ingestion, validation, duplicates, counts, ordering, origin/CORS, limits, and heatmap queries.
+`npm test` runs both the API and demo suites; it needs MongoDB. Tests use a database ending in `_test` distinct from `MONGODB_URI`, clean it between cases, and drop it afterwards. Never use a production database as `MONGODB_TEST_URI`. Currently 41 Vitest tests cover ingestion, validation, duplicates, counts, ordering, origin/CORS, limits, heatmaps, and historical funnels. Five Node test cases additionally cover generated pages/API URL rewriting, cart validation/totals, simulator flags/reproducibility, and rate-gate pacing/backoff. Browser journeys are separate live integration checks.
 
 Production dashboard output is `apps/dashboard/dist`. For a local production preview, stop the dashboard dev server, then run `cd apps/dashboard && npm run preview` on port 5173.
 
@@ -202,9 +208,68 @@ This check uses default local MongoDB `insightflow`, default ports, and the seed
 
 ```bash
 node verification/dashboard-browser.mjs
+node verification/store-browser.mjs
+node verification/shopper-dashboard.mjs
 ```
 
-The dashboard check uses live seed data plus intercepted responses for loading/empty/error cases; screenshots are saved to ignored `verification/artifacts/`. Chromium checks were executed. Firefox and the hosted flow have **not** been verified.
+The original dashboard check uses live seed data plus intercepted responses for loading/empty/error cases; its screenshots go to ignored `verification/artifacts/`. The store check verifies both viewport purchase flows against MongoDB, every page, cart/error states, CSP and request destinations. The shopper dashboard check verifies long journeys, pagination, all page options, tall canvas pixels and device filters. Run it after seeding or simulation; it needs a journey with at least six views and 15 clicks. The two new checks refresh the committed `docs/screenshots/` images, so screenshot changes after a new workload are expected. Chromium checks were executed. Firefox and the hosted flow have **not** been verified.
+
+## Northwind Goods demo store
+
+The committed HTML works immediately with the Python server; no browser framework or build step is required to serve it. Pages are `/`, `/shop.html`, `/cart.html`, `/checkout.html`, `/order-confirmation.html`, `/about.html`, `/contact.html`, and eight `/products/<slug>.html` pages: `aurora-headphones`, `field-backpack`, `ceramic-mug`, `trail-bottle`, `linen-throw`, `desk-lamp`, `canvas-sneakers`, `merino-beanie`.
+
+Shop category/search filters and sorting stay on the same pathname. Product pages have local SVG galleries, colors/sizes, quantities, tabs, FAQs and related products. The bag persists across pages; prices use integer cents, quantities are capped at 20 per variant, and DEMO10 gives a rounded 10% discount. Checkout only previews fixed fictional details and clears the bag on confirmation. The footer makes clear that no real orders exist.
+
+`apps/demo-site/data/products.json` is the single product source (prices in cents). `scripts/build.js` and `templates/page.html` generate **all** pages, keeping header/footer/tracker/CSP consistent. After changing data or templates, regenerate and commit the HTML:
+
+```bash
+npm run build --prefix apps/demo-site
+# Deployment example: origin only, no /api suffix or trailing path
+DEMO_API_URL=https://your-api.onrender.com npm run build --prefix apps/demo-site
+# Restore localhost HTML before local QA
+npm run build --prefix apps/demo-site
+```
+
+`DEMO_API_URL` defaults to `http://localhost:5000`. Its value must be an HTTP(S) origin without credentials, query, hash or path. It rewrites both tracker attributes and the restrictive meta CSP. The site uses system fonts, shared local CSS/JS/JSON and inline SVG art; no CDN assets are needed. Store interactions remain available when the analytics API is down, with the SDK’s existing silent-failure behavior.
+
+## Traffic simulator
+
+Start MongoDB, API and demo using the setup above. Install Chromium once (same full-browser download as verification):
+
+```bash
+export PLAYWRIGHT_BROWSERS_PATH="$PWD/.cache/browsers"
+npm exec --prefix apps/demo-site -- playwright install chromium --no-shell
+npm run simulate --prefix apps/demo-site -- --sessions 40 --seed 42
+# Custom local origin / debugging example (headed needs a graphical display)
+npm run simulate --prefix apps/demo-site -- --sessions 5 --base-url http://localhost:5174 --concurrency 2 --seed 7 --headed
+```
+
+Keep `PLAYWRIGHT_BROWSERS_PATH` exported in the terminal running simulation/browser checks. The dashboard is optional while generating traffic; reload it afterward to see newly stored events. A full run takes several minutes because each shopper pauses and scrolls.
+
+| Flag | Default | Meaning |
+| --- | --- | --- |
+| `--sessions N` | 40 | 1–500 shopper visits, each in a fresh browser context |
+| `--base-url` | `http://localhost:5174` | Your demo’s local HTTP(S) origin; localhost/loopback only |
+| `--concurrency N` | 3 | 1–5 simultaneous shoppers sharing one ingestion budget |
+| `--seed N` | 42 | Unsigned 32-bit seed for persona/action choices |
+| `--headed` | Off | Show Chromium for debugging |
+
+Weighted personas: bounce 22%, researcher 26%, buyer 18%, abandoner 17%, mobile 17%. Viewports also vary within other personas. Shoppers click/tap real elements at varied offsets, pause, scroll in steps, explore galleries/options/tabs/FAQs, and sometimes click non-interactive copy. Researchers visit multiple products; buyers finish fake checkout; abandoners leave the bag; mobile shoppers use the hamburger menu. Some returning visitors expire the stored session timestamp by 31 minutes, exercising rotation without changing event timestamps.
+
+The simulator only permits your local demo and its local SDK/API; remote targets and ingestion redirects are blocked. Playwright forwards the **original tracker-generated requests unchanged** through a shared 350 ms gate (at most 172/minute) to settle keepalive requests reliably across navigation. This pacing layer belongs to the simulator, not the SDK. A 429 pauses all workers for at least 60 seconds/Retry-After and increases spacing; the rejected event is reported, not retried. Other traffic on the same IP shares the API’s 300/minute limit, so avoid overlapping heavy browser QA or multiple simulator processes.
+
+The final `SUMMARY` prints completed visits, persona counts, accepted events, 429s, failures, rotations, tracker session IDs, and peak requests/minute. Nonzero failures or no accepted events give a failing exit status. Forty visits can create more than 40 tracker sessions due to deliberate rotation. The verified seed-42 run produced 667 stored events across 43 tracker sessions, all five personas, zero failures/429s and a peak of 160/minute; see [simulation evidence](docs/simulation-report.json). This is an executed example, not a promise that all future timings/counts are identical.
+
+Historical seed traffic is generated directly into MongoDB with past timestamps and approximate layout hotspots. It covers all 15 paths, a desktop/mobile mix, and a home→shop→cart→checkout→confirmation funnel of 30→21→12→5→2 sessions. Simulation uses real browser/tracker clicks and current timestamps, providing measured document dimensions and coordinates. Use `npm run seed` without reset to preserve simulation; use `--reset` only when intentionally replacing demo data.
+
+## Verified screenshots
+
+These show synthetic seed/simulated data from executed local Chromium checks. The heatmap is an approximate coordinate canvas rather than a page screenshot overlay.
+
+![Northwind Goods storefront](docs/screenshots/storefront.png)
+![Sessions and event counts](docs/screenshots/sessions.png)
+![Ordered shopper journey](docs/screenshots/journey.png)
+![Aurora headphones heatmap](docs/screenshots/product-heatmap.png)
 
 ## Embed snippet
 
@@ -226,7 +291,7 @@ Base URL: `http://localhost:5000`. Read APIs are unauthenticated; browser CORS i
 | --- | --- | --- |
 | `GET /api/health` | None | `200 {"status":"ok"}` |
 | `POST /api/events` | JSON text body below | `202 {"ok":true}`; repeat ID: `200 {"ok":true,"duplicate":true}` |
-| `GET /api/sites` | None | `200 {"sites":[{"_id":"demo_store","name":"Demo Store"}]}` |
+| `GET /api/sites` | None | `200 {"sites":[{"_id":"demo_store","name":"Northwind Goods (demo)"}]}` |
 | `GET /api/sites/:siteId/sessions` | `page=1`, `limit=20`; limit 1–100, page 1–1,000,000 | `200 {"sessions":[{"session_id":"…","event_count":3,"page_views":1,"clicks":2,"started_at":"…","last_seen_at":"…"}],"page":1,"limit":20,"total":30}` |
 | `GET /api/sites/:siteId/sessions/:sessionId/events` | Site + session IDs | `200 {"session_id":"…","events":[{"event_id":"…","session_id":"…","event_type":"page_view","page_url":"http://localhost:5174/","timestamp":"…"}]}` |
 | `GET /api/sites/:siteId/pages` | Site ID | `200 {"pages":[{"page_url":"http://localhost:5174/","views":30,"clicks":120}]}` |
@@ -279,15 +344,20 @@ The API initializes indexes before listening. Sessions are aggregated from event
 - Individual fetch requests use keepalive with no batching or retry queue. Network failures, unavailable APIs, navigation timing, browser/ad blocker policies, and cold starts can lose events. Transport failure is silent; native browser network diagnostics may still appear.
 - Heatmaps scale each point using its own document dimensions onto an 800 px canvas, with a median layout ratio and height capped at 4000 px. Responsive layouts move content, so this is approximate. Desktop is viewport width ≥768; mobile is below 768. It is a dots/soft-gradient grid, not a screenshot overlay.
 - Sessions use aggregation rather than a separate collection, keeping counts consistent with event storage. Large datasets need materialized summaries/retention and deeper pagination changes. Queries are bounded for sessions/heatmap; one session's full journey and page list are uncapped as requested.
-- No consent banner, bot filtering, authentication system, retention policy, or SPA history patch. The demo buttons are instrumentation controls, not a commerce app.
+- No consent banner, bot filtering, authentication system, retention policy, or SPA history patch.
+- Northwind Goods is fictional: checkout/contact/newsletter show fixed readonly fake values, send no form contents, and place no real orders. No payments or personal data are collected. Cart quantities/options and the recognized DEMO10 code use `northwind-goods:*` storage keys, separate from tracker keys. Blocked storage falls back within the current document; persistence across navigation requires localStorage.
+- Simulated shopper traffic is synthetic, only for demonstration. It uses the real tracker and actual current timestamps, while historical seed data is explicitly fabricated. Seeded choices are reproducible; concurrent completion order, event UUIDs, and wall-clock timestamps vary. No remote fonts/images/scripts are used by the store; only the configured first-party SDK/API is requested beyond the static origin.
+- Every product/page has its own pathname because queries and hashes are stripped from tracked URLs. Client-side filters, tabs, galleries, and quantity changes generate clicks on the current page.
 - Render free-tier services sleep when idle; first requests can take around a minute. Early events may be lost while the API wakes. This hosted behavior is a deployment consideration, not a result measured here.
 - The SDK and local dashboard were tested in Chromium. Firefox, mobile hardware, and production hosting need the manual QA below.
 
 ## Manual QA checklist
 
 - [ ] Fresh browser profile: load demo; one page view and a UUID at localStorage key `insightflow:demo_store:session`.
-- [ ] Reload and navigate home → products → cart; the session persists and page views appear.
-- [ ] Click top/bottom buttons; bottom y exceeds viewport height; button handlers stop propagation but capture tracking still records them.
+- [ ] Reload and navigate home → shop → product → cart; the session persists and page views appear.
+- [ ] Click search and newsletter controls; bottom y exceeds viewport height. Tracker browser QA explicitly tests stopPropagation against the capture listener.
+- [ ] Filter/sort shop; switch product thumbnails/options/tabs; add two headphones, reload, change quantities, apply DEMO10, and complete fake checkout. Verify cart totals, empty state, and responsive hamburger menu.
+- [ ] Run the simulator; compare its accepted-event summary with the dashboard/API and inspect product heatmap device filters.
 - [ ] Edit stored `last` to `Date.now() - 31 * 60 * 1000`; next click creates a different UUID.
 - [ ] Stop API after tracker loads; host buttons still work without uncaught page errors.
 - [ ] Block storage; events within one page keep the same fallback session.
@@ -308,14 +378,14 @@ No accounts were created, credentials entered, remote repository pushed, or host
    MONGODB_URI='<atlas-uri>' DEMO_ORIGINS='https://<your-demo>.vercel.app,http://localhost:5174' npm run seed
    ```
 
-   No deployment URL exists yet; substitute your actual planned/assigned URL. Rerun this after the demo URL is known. It updates allowed origins and appends 30 synthetic sessions; add `-- --reset` only if deleting existing demo events is intended. Seed URLs use the first origin.
+   No deployment URL exists yet; substitute your actual planned/assigned URL. Rerun this after the demo URL is known. It updates allowed origins and inserts only missing historical seed events; add `-- --reset` only if deleting existing demo events is intended. Seed URLs use the first origin.
 
 4. **Render API:** create a Web Service from the GitHub repo. Root Directory `apps/api`; guide Build Command `npm install`; Start Command `npm start`; Health Check Path `/api/health`. The included `render.yaml` uses reproducible `npm ci --omit=dev`, equivalent for this runtime, and needs no cross-directory SDK build.
 
    Set `MONGODB_URI=<atlas-uri>`, `NODE_ENV=production`, `NODE_VERSION=20`, `TRUST_PROXY=1`, and temporary `DASHBOARD_ORIGIN=http://localhost:5173`. Render supplies `PORT` (blueprint defaults to 10000). `DEMO_ORIGINS` is used when running seed locally, not during API requests. Confirm `https://<api>.onrender.com/api/health` and `/sdk/tracker.js` load; the tracker response must include `Cross-Origin-Resource-Policy: cross-origin`.
 
 5. **Vercel dashboard:** import the same repo with Root Directory `apps/dashboard`, framework Vite, Install Command `npm ci`, Build Command `npm run build`, Output Directory `dist`. Set `VITE_API_URL=https://<api>.onrender.com` before building. The project contains `vercel.json` with build/output settings. No authentication tokens belong in `VITE_` variables.
-6. **Vercel demo:** create a second project with Root Directory `apps/demo-site`, framework Other, no install/build command, Output Directory `.`. In **all three HTML pages**, replace the script `src` with `https://<api>.onrender.com/sdk/tracker.js` and `data-api-url` with `https://<api>.onrender.com/api/events`, retaining `data-site-id="demo_store"`; commit and push. The included `vercel.json` preserves `.html` URLs (`cleanUrls: false`) to match seeded paths.
+6. **Vercel demo:** create a second project with Root Directory `apps/demo-site`, framework Other, Install Command `npm ci`, Build Command `npm run build`, Output Directory `.`. Set **`DEMO_API_URL=https://<api>.onrender.com`** before building. The generator writes the identical tracker `src`, `data-api-url`, and CSP API origin into all 15 pages automatically. Do not hand-edit generated HTML. The included `vercel.json` preserves `.html` URLs (`cleanUrls: false`) to match tracked and seeded paths. Playwright is a development tool; Vercel does not need to install a browser or run simulation.
 7. **Connect origins:** set Render `DASHBOARD_ORIGIN` to the exact dashboard Vercel origin (optionally comma-separate `http://localhost:5173`). Rerun production seed with the actual demo Vercel URL first in `DEMO_ORIGINS`, so page URLs and allowed Origins match. Redeploy/restart affected services after environment changes.
 8. **Verify hosted flow:** visit the hosted demo, click/scroll/navigate, find the new session and ordered events in the hosted dashboard, and inspect heatmap dots. Check both Chrome and Firefox/private windows. Update live links and submission notes only after seeing it work.
 
