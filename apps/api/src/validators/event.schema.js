@@ -1,7 +1,9 @@
 import { z } from 'zod';
 const dimension = z.number().int().positive().max(100000);
 export const pageUrlSchema = z.string().url().max(2048)
-  .refine((value) => ['http:', 'https:'].includes(new URL(value).protocol), 'URL must use HTTP or HTTPS')
+  .refine((value) => {
+    try { return ['http:', 'https:'].includes(new URL(value).protocol); } catch { return false; }
+  }, 'URL must use HTTP or HTTPS')
   .transform((value) => { const url = new URL(value); return url.origin + url.pathname; });
 const clickSchema = z.object({
   x: z.number().min(0).max(100000), y: z.number().min(0).max(100000),

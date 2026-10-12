@@ -48,3 +48,11 @@ Next: phase 3 dashboard. Demo server remains on 5174. API verification script sh
 - Guide fixes: aborted stale requests and cleared old data during loading, keyboard-accessible session buttons, explicit page loading state, documented 5000 cap. Tailwind used with minimal project CSS; no scaffold assets.
 
 Next: phase 4 API integration/validator tests, against a separate _test database.
+
+## Phase 4 completed
+- `npm test --prefix apps/api`: 39 tests passed (24 Supertest/integration, 15 validator).
+- First run: 37 passed, 2 failed. Malformed URL refinement threw TypeError and caused HTTP 500. Guarded URL parsing in refinement and reran: 39/39 passed.
+- Coverage includes actual MongoDB writes, concurrent and sequential duplicate IDs, missing click data, unknown site, Origin rejection, five-minute future limit, malformed JSON/URL, 10kb limit, 429 rate limit, CORS, exact grouped counts/pagination/site isolation, timestamp/_id ordering, pages, 5001-click cap/latest ordering, empty states, tracker CORP.
+- Tests require a database ending in _test distinct from MONGODB_URI, clean it between cases, and drop only that database on completion.
+
+Next: phase 5 quality review, dependency advisories, lint, and secret/history checks.
