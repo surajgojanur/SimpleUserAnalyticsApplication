@@ -129,7 +129,10 @@ try {
   await visible(empty, 'No sessions yet. Visit the demo site to start tracking.');
   await empty.getByRole('button', { name: 'Heatmap', exact: true }).click();
   await visible(empty, 'Loading pages…');
-  await visible(empty, 'No pages tracked yet.');
+  await visible(
+    empty,
+    'No pages tracked for this environment. Choose another environment to view historical data.',
+  );
   await empty.close();
   const brokenSessions = await pageWith([
     siteRoute,
@@ -163,8 +166,9 @@ try {
     ],
   ]) {
     const fixture = await pageWith([[pattern, body, status]]);
+    const loading = pattern.includes('heatmap') ? visible(fixture, 'Loading click data…') : null;
     await fixture.getByRole('button', { name: 'Heatmap', exact: true }).click();
-    if (pattern.includes('heatmap')) await visible(fixture, 'Loading click data…');
+    if (loading) await loading;
     await visible(fixture, text);
     await fixture.close();
   }

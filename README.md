@@ -392,6 +392,12 @@ Set the store's `DEMO_API_URL` and dashboard's `VITE_API_URL` to the Render orig
 | Delayed hosted response | Wait for Render cold start; reload dashboard/demo |
 | npm edgesOut resolution crash | Run npm ci from apps/api so its .npmrc is applied |
 
+## Security Considerations — Public Demo API
+
+InsightFlow Analytics is a hiring-assignment demonstration. Its analytics read endpoints intentionally remain public and do not require user authentication. Anyone who can reach these endpoints can potentially request analytics data. Browser CORS configuration is not authentication or authorization.
+
+Do not store private customer analytics without additional access controls. Commercial applications should authenticate users and authorize access with site-level permissions. MongoDB connection strings and other credentials must remain server-side. The fictional storefront does not process real payments or customer orders. Public access is intentionally retained for this demo; it is not suitable for commercial multi-tenant use without these protections.
+
 ## Future work
 
 Authentication and site ownership, consent controls, bot filtering, retry/batching, SPA route integration, retention, materialized session summaries, screenshot overlays, and cross-browser CI. These are intentionally outside the assignment's current scope.

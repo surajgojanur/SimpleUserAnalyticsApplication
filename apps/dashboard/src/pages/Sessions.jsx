@@ -35,6 +35,10 @@ export default function Sessions({ siteId }) {
           Explore event counts and follow each visitor’s ordered journey. Refreshes every 15 seconds
           while this tab is visible.
         </p>
+        <p className="mt-2 text-xs text-slate-500" data-testid="last-updated">
+          Last updated:{' '}
+          {list.lastUpdatedAt ? new Date(list.lastUpdatedAt).toLocaleTimeString() : '—'}
+        </p>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-2">
         <section className="panel min-w-0" aria-label="Visitor sessions">

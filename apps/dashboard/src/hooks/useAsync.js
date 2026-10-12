@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 export function useAsync(load, { refreshMs = 0 } = {}) {
-  const [state, setState] = useState({ loading: true, data: null, error: null });
+  const empty = { loading: true, data: null, error: null, lastUpdatedAt: null };
+  const [state, setState] = useState({ ...empty, source: load });
 
   useEffect(() => {
     let active = true;
@@ -16,13 +17,22 @@ export function useAsync(load, { refreshMs = 0 } = {}) {
       const request = new AbortController();
       controller = request;
       pending = true;
-      if (initial) setState({ loading: true, data: null, error: null });
+      if (initial)
+        setState({ loading: true, data: null, error: null, lastUpdatedAt: null, source: load });
       try {
         const data = await load(request.signal);
-        if (active && !request.signal.aborted) setState({ loading: false, data, error: null });
+        if (active && !request.signal.aborted)
+          setState({
+            source: load,
+            loading: false,
+            data,
+            error: null,
+            lastUpdatedAt: data === null ? null : new Date().toISOString(),
+          });
       } catch (error) {
         if (active && !request.signal.aborted)
           setState((previous) => ({
+            ...previous,
             loading: false,
             data: initial ? null : previous.data,
             error: String(error?.message || error),
@@ -54,5 +64,5 @@ export function useAsync(load, { refreshMs = 0 } = {}) {
     };
   }, [load, refreshMs]);
 
-  return state;
+  return state.source === load ? state : empty;
 }
