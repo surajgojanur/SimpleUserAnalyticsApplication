@@ -32,7 +32,8 @@ export default function Sessions({ siteId }) {
         <p className="eyebrow">Visitor activity</p>
         <h2 className="mt-1 text-2xl font-semibold">Sessions</h2>
         <p className="mt-2 text-sm text-slate-500">
-          Explore event counts and follow each visitor’s ordered journey. Refreshes every 15 seconds while this tab is visible.
+          Explore event counts and follow each visitor’s ordered journey. Refreshes every 15 seconds
+          while this tab is visible.
         </p>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-2">

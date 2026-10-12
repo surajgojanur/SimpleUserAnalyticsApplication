@@ -7,7 +7,10 @@ export default function Heatmap({ siteId }) {
   const [selectedUrl, setSelectedUrl] = useState('');
   const [device, setDevice] = useState('all');
   const [mode, setMode] = useState('heat');
-  const pages = useAsync(useCallback((signal) => api.pages(siteId, signal), [siteId]), { refreshMs: 15000 });
+  const pages = useAsync(
+    useCallback((signal) => api.pages(siteId, signal), [siteId]),
+    { refreshMs: 15000 },
+  );
   const url = selectedUrl || pages.data?.pages[0]?.page_url || '';
   const map = useAsync(
     useCallback((signal) => (url ? api.heatmap(siteId, url, signal) : null), [siteId, url]),
@@ -24,7 +27,8 @@ export default function Heatmap({ siteId }) {
         <p className="eyebrow">Interaction patterns</p>
         <h2 className="mt-1 text-2xl font-semibold">Click heatmap</h2>
         <p className="mt-2 text-sm text-slate-500">
-          See where visitors interact across the full document. Refreshes every 15 seconds while this tab is visible.
+          See where visitors interact across the full document. Refreshes every 15 seconds while
+          this tab is visible.
         </p>
       </div>
       <section className="panel">
