@@ -38,3 +38,13 @@ Next: phase 2 tracker/demo. API process currently running; local MongoDB is avai
 - Guide fixes: all future tracker callbacks guarded individually; corrupt stored session data rejected; demo bottom button placed at the bottom. Optional SPA history monkey patch omitted to keep assignment scope small; full navigation supported.
 
 Next: phase 3 dashboard. Demo server remains on 5174. API verification script shuts down its own server; start API again for dashboard checks.
+
+## Phase 3 completed
+- `npm run build --prefix apps/dashboard`: Vite production build passed (36 modules).
+- `npm run dev` in apps/dashboard serves 5173; API on 5000 and demo on 5174.
+- `PLAYWRIGHT_BROWSERS_PATH=$PWD/.cache/browsers node verification/dashboard-browser.mjs`: PASS. Live counts matched API, journey length/order checked, pagination worked, canvas red pixel verified at a click's scaled coordinates, desktop/mobile filters matched exact API counts, mobile viewport had no horizontal overflow.
+- Browser interception verified loading, empty, and error states for sites, sessions, journey, pages, and click data. No unexpected page or console errors; deliberately injected 503 diagnostics excluded.
+- Screenshots saved under ignored verification/artifacts; both inspected visually.
+- Guide fixes: aborted stale requests and cleared old data during loading, keyboard-accessible session buttons, explicit page loading state, documented 5000 cap. Tailwind used with minimal project CSS; no scaffold assets.
+
+Next: phase 4 API integration/validator tests, against a separate _test database.
