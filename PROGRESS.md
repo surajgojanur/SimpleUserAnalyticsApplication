@@ -15,7 +15,7 @@ The complete 34-page PDF in docs was read before writing code. The assignment wi
 4. Tests: completed.
 5. Quality: completed.
 6. Documentation/deployment preparation: completed.
-7. Fresh clone: in progress.
+7. Fresh clone: completed.
 
 ## Continuation
 Read this file and git log first. Run only checks appropriate to the current phase; do not repeat completed implementation. Local ignored .env files use synthetic/local settings. Deployment and public GitHub publication require human accounts and credentials and will be documented as MANUAL STEPS.
@@ -85,3 +85,24 @@ Next: phase 7 fresh clone into verification/fresh-clone. Stop original service p
 - In clone: npm test 39/39, lint, format, tracker/dashboard build, secret scan (7 commits/98 text blobs), clean Git diff all passed. Bundle rebuild produced no changes.
 - Started cloned API via npm run dev, cloned dashboard on 5173, cloned demo on 5174. First immediate curl attempt raced startup and failed to connect. After API listening message, all curl smoke assertions passed. README now explicitly says to wait for server readiness.
 - Browser download into clone-local .cache is in progress; tracker and dashboard browser verification still required before marking phase 7 complete.
+
+
+## Phase 7 completed
+- Fresh clone followed the README alone, then fast-forwarded its documentation-only readiness correction to 4e3ff49. No copied dependencies, env files, or browser cache from original checkout.
+- `npm ci` in API/dashboard/tracker/root/verification succeeded. `npm run seed -- --reset`: 30 sessions/358 events.
+- Clone checks: `npm test` 39/39; `npm run lint`; `npm run format`; `npm run build`; live `curl /api/health`; `python3 verification/api-smoke.py`; `python3 verification/secrets.py` (8 commits/100 unique text blobs): passed. `git diff --exit-code` and status clean. Tracker build exactly matched committed asset.
+- Downloaded full Chromium into clone's .cache with the exact README install command (`--no-shell`). Both clone-local browser scripts passed: tracker verified actual MongoDB/session/coordinates/storage/offline behavior; dashboard verified counts/rendered journey order, pagination, page switching, canvas pixel position, filters, responsive width, and loading/empty/error cases, with no unexpected browser errors. Clone screenshots are in ignored verification/fresh-clone/verification/artifacts.
+- Stopped cloned servers; restarted original checkout API/dashboard/demo. All three returned HTTP 200 at 5000/api/health, 5173/, and 5174/. They are left running for review.
+
+## Definition of done evidence
+1. Single-tag page_view and click persistence: actual Chromium demo + MongoDB query assertions passed, including same session across pages and scroll y=2054.
+2. Required API capabilities: curl smoke + real MongoDB Supertest suite passed; validation/rejection/duplicate codes verified.
+3. Dashboard: actual Chromium sessions/counts/clickable ordered journey/canvas dots/page selection/device filtering passed; all loading/empty/error states exercised.
+4. Tests/build/security: 39 tests, production build, lint, formatting, 0 audit vulnerabilities across all packages; history secret-pattern scan passed, env excluded.
+5. README-only fresh checkout: installation, seed, all services, API checks, tests, build, both browser scripts executed successfully.
+6. Deployment preparation: Render/Vercel configs and ordered Atlas/Render/Vercel manual steps documented. Hosted deployment is not executed.
+
+## Remaining MANUAL STEPS / handoff
+- Create public GitHub repository and push main; create Atlas cluster/user, Render service, and two Vercel projects; set actual environment variables; replace all demo tracker URLs; update allowed origins via seed; verify hosted flow in Chrome/Firefox; update README live links. No credentials/accounts or hosted results were invented.
+- Local assumptions/limitations and guide corrections are fully documented in README. Requested model/reasoning setting could not be selected through session tools and is not claimed verified.
+- All seven local phases are complete. Do not repeat implementation. For future work read README and git log. If processes are gone, start the three services using README; existing MongoDB on port 27017 was used. Ignored fresh-clone/cache/artifact directories retain verification evidence and are not submission source.
