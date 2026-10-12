@@ -68,7 +68,7 @@ try {
       () => JSON.parse(localStorage.getItem('insightflow:demo_store:session')).id,
     );
     if (mobile) {
-      await page.getByRole('button', { name: 'Open menu', exact: true }).click();
+      await page.getByRole('button', { name: 'Open menu', exact: true }).tap();
       assert.equal(await page.locator('.menu-toggle').getAttribute('aria-expanded'), 'true');
     }
     await page.locator('#main-nav a[href="/shop.html"]').click();

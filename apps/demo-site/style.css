@@ -717,6 +717,7 @@ dl .total {
   font-size: 22px;
 }
 .toast {
+  pointer-events: none;
   position: fixed;
   bottom: 18px;
   right: 20px;
@@ -939,6 +940,7 @@ dl .total {
     min-height: 900px;
   }
   .toast {
+    pointer-events: none;
     bottom: 10px;
     right: 10px;
     max-width: calc(100% - 20px);

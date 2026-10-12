@@ -47,6 +47,11 @@ try {
   await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   const session = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).id, key);
   await waitCount(session, 1);
+  await page.evaluate(() =>
+    document
+      .querySelector('#search-button')
+      .addEventListener('click', (event) => event.stopPropagation()),
+  );
   await page.click('#search-button');
   await page.locator('#newsletter-submit').scrollIntoViewIfNeeded();
   await page.click('#newsletter-submit');
@@ -71,7 +76,7 @@ try {
   );
   events = await waitCount(session, 6);
   assert.equal(events.filter((event) => event.event_type === 'page_view').length, 3);
-  await page.locator('nav a[href="/cart.html"]').click();
+  await page.locator('.cart-link').click();
   await page.waitForURL('**/cart.html');
   await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   await waitCount(session, 8);

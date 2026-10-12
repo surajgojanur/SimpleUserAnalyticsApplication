@@ -129,3 +129,12 @@ The new extension request takes precedence over the earlier finished milestone. 
 - API unit suite expanded from 39 to 41 passing tests: all 15 real paths, 30→21→12→5→2 funnel, desktop/mobile clicks, valid event schema, stable IDs, past timestamps. No runtime API/model/tracker changes.
 - Hotspots vary by page type and device; historical art/layout positions are approximate. Seed alone supplies past timestamps; simulator uses actual tracker timestamps.
 - Live curl smoke adapted from exactly 3 pages to at least 15 actual page paths: passed all original endpoint/status/count/normalization checks.
+
+### Simulator implementation verified and committed
+- Five-session pilot (`--sessions 5 --seed 42 --concurrency 2`): 5 completed, buyer 3/researcher 2, 119 accepted events, no failed sessions or 429s, observed peak 110 requests/minute. Desktop/mobile physical click/tap paths were exercised.
+- Initial pilot produced two timeout failures because Playwright navigation keepalive lifecycle callbacks did not settle. Simulator now rate-gates and explicitly forwards each original tracker request unchanged using Playwright routing (no generated payloads or altered timestamps), awaits the actual API response, and fulfills it back to the browser. Nothing changed in tracker or API runtime.
+- All API forwarding forbids redirects; non-local targets and unrelated API paths are blocked. Global spacing is 350 ms (at most 172 requests/minute); 429 uses Retry-After with at least 60 s global pause and doubles spacing. Unit test uses a controlled clock to verify serialized pacing/backoff. Seeded choices are per-context reproducible; wall-clock timestamps and concurrent completion order intentionally are not.
+- Existing tracker regression initially used an obsolete nav cart selector; updated to the actual bag link, rerun passed every original assertion, y=2800. Added an explicit stopPropagation handler in the check to retain capture-phase proof. Toasts no longer intercept clicks.
+- Valid CLI flags, bounds, local-only URLs, seeded persona choices, rate-gate serialization/backoff tested. Browser launch/download stays project-local via PLAYWRIGHT_BROWSERS_PATH.
+
+Next: full 40-session workload, dashboard screenshots/evidence, documentation and fresh clone. The original API is running again on 5000.
