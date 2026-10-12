@@ -3,43 +3,82 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Demo Store — Cart</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' http://localhost:5000; connect-src 'self' http://localhost:5000; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Your bag · Northwind Goods</title>
+    <meta
+      name="description"
+      content="A fictional store for everyday essentials. Demo only, no real orders."
+    />
     <link rel="stylesheet" href="/style.css" />
     <link rel="icon" href="data:," />
   </head>
-  <body>
-    <nav>
-      <strong>Demo Store</strong><a href="/">Home</a><a href="/products.html">Products</a
-      ><a href="/cart.html">Cart</a>
-    </nav>
-    <main>
-      <p>INSIGHTFLOW TRACKING DEMO</p>
-      <h1>Your demo cart.</h1>
-      <p>A simple final stop in the journey. No orders or payments are processed.</p>
-      <button id="primary" class="primary">Try this button</button
-      ><button id="secondary">Learn more</button>
-      <p id="feedback" aria-live="polite">Ready to explore.</p>
-      <section class="tall">
-        <p>Scroll down to test document coordinates.</p>
+  <body data-page="cart">
+    <a class="skip-link" href="#content">Skip to content</a>
+    <div class="announcement">
+      A considered collection for everyday living <span>· Demo store</span>
+    </div>
+    <header class="header">
+      <div class="header-inner">
+        <a class="logo" href="/" aria-label="Northwind Goods home"
+          ><span class="brand-mark" aria-hidden="true">N↗</span>northwind<span class="logo-sub"
+            >GOODS</span
+          ></a
+        >
+        <button
+          class="menu-toggle"
+          aria-expanded="false"
+          aria-controls="main-nav"
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <nav id="main-nav" aria-label="Main navigation">
+          <a href="/shop.html">Shop</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </nav>
+        <form class="search" id="search-form">
+          <label class="sr-only" for="search">Search the collection</label
+          ><input
+            id="search"
+            type="search"
+            placeholder="Find something good"
+            maxlength="60"
+          /><button id="search-button" aria-label="Search">⌕</button>
+        </form>
+        <a class="cart-link" href="/cart.html" aria-label="Cart"
+          >Bag <span data-cart-count aria-live="polite">0</span></a
+        >
+      </div>
+    </header>
+    <main id="content"><section class="wrap section"><p class="eyebrow">Your everyday edit</p><h1>Your bag</h1><p>Take a moment. This is a fictional cart; no real purchases.</p><div class="cart-layout"><div id="cart-lines"></div><aside class="order-summary"><h2>Order summary</h2><div id="cart-totals"></div><form id="promo-form"><label for="promo">Demo promo code</label><div class="promo-row"><input id="promo" placeholder="Try DEMO10" maxlength="20"><button id="apply-promo">Apply</button></div></form><p id="promo-feedback" role="status"></p><a class="button primary" id="checkout-link" href="/checkout.html">Checkout</a><a class="button" href="/shop.html">Continue shopping</a><p class="fine-print">No real orders. Fictional free shipping.</p></aside></div></section></main>
+    <p id="feedback" class="toast" role="status" aria-live="polite"></p>
+    <footer>
+      <div class="footer-grid">
         <div>
-          <h2>You made it to the bottom.</h2>
-          <button id="bottom">Button far down the page</button>
+          <a class="logo" href="/">northwind goods</a>
+          <p>Fewer things. Better days.</p>
+          <p class="demo-notice">
+            Demo store, no real orders. All products, reviews, and shopper traffic are fictional.
+          </p>
         </div>
-      </section>
-    </main>
-    <script>
-      document.querySelectorAll('button').forEach((button) =>
-        button.addEventListener('click', (event) => {
-          event.stopPropagation();
-          document.querySelector('#feedback').textContent = 'Clicked: ' + button.textContent;
-        }),
-      );
-    </script>
-    <script
-      async
-      src="http://localhost:5000/sdk/tracker.js"
-      data-site-id="demo_store"
-      data-api-url="http://localhost:5000/api/events"
-    ></script>
+        <div>
+          <h2>Explore</h2>
+          <a href="/shop.html">Shop all</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>A little reassurance</h2>
+          <p>Fictional free delivery over $75.</p>
+          <p>Demo returns within 30 days.</p>
+          <p>No payments or personal information.</p>
+        </div>
+      </div>
+      <p class="footer-bottom">Northwind Goods · An InsightFlow Analytics demo</p>
+    </footer>
+    <script type="module" src="/js/store.js"></script>
+    <script async src="http://localhost:5000/sdk/tracker.js" data-site-id="demo_store" data-api-url="http://localhost:5000/api/events"></script>
   </body>
 </html>

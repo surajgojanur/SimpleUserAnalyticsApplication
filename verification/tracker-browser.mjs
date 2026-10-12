@@ -44,12 +44,12 @@ try {
   page.on('pageerror', (error) => errors.push(error.message));
   const key = 'insightflow:demo_store:session';
   await page.goto('http://localhost:5174/?secret=discard#section');
-  await page.waitForFunction(() => window.__insightflow);
+  await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   const session = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).id, key);
   await waitCount(session, 1);
-  await page.click('#primary');
-  await page.locator('#bottom').scrollIntoViewIfNeeded();
-  await page.click('#bottom');
+  await page.click('#search-button');
+  await page.locator('#newsletter-submit').scrollIntoViewIfNeeded();
+  await page.click('#newsletter-submit');
   let events = await waitCount(session, 3);
   const clicks = events.filter((event) => event.event_type === 'click');
   assert.equal(clicks.length, 2);
@@ -60,11 +60,11 @@ try {
     ),
   );
   assert(events.every((event) => event.page_url === 'http://localhost:5174/'));
-  await page.locator('nav a[href="/products.html"]').click();
-  await page.waitForURL('**/products.html');
-  await page.waitForFunction(() => window.__insightflow);
+  await page.locator('nav a[href="/shop.html"]').click();
+  await page.waitForURL('**/shop.html');
+  await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   await page.reload();
-  await page.waitForFunction(() => window.__insightflow);
+  await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   assert.equal(
     await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).id, key),
     session,
@@ -73,22 +73,22 @@ try {
   assert.equal(events.filter((event) => event.event_type === 'page_view').length, 3);
   await page.locator('nav a[href="/cart.html"]').click();
   await page.waitForURL('**/cart.html');
-  await page.waitForFunction(() => window.__insightflow);
+  await page.waitForFunction(() => window.__insightflow && document.body.dataset.ready === 'true');
   await waitCount(session, 8);
   await page.evaluate((key) => {
     const stored = JSON.parse(localStorage.getItem(key));
     stored.last = Date.now() - 31 * 60000;
     localStorage.setItem(key, JSON.stringify(stored));
   }, key);
-  await page.click('#primary');
+  await page.click('#apply-promo');
   const nextSession = await page.evaluate((key) => JSON.parse(localStorage.getItem(key)).id, key);
   assert.notEqual(nextSession, session);
   await waitCount(nextSession, 1);
   // Load the tracker first, then actually stop the API and exercise host controls.
   await stopServer();
-  await page.click('#secondary');
+  await page.click('#apply-promo');
   await page.waitForTimeout(250);
-  assert.match(await page.locator('#feedback').innerText(), /Learn more/);
+  assert.match(await page.locator('#promo-feedback').innerText(), /Enter DEMO10/);
   assert.deepEqual(errors, []);
   await startServer();
   const blocked = await browser.newContext();
@@ -107,9 +107,11 @@ try {
     if (request.url().endsWith('/api/events')) responses.push(JSON.parse(request.postData()));
   });
   await blockedPage.goto('http://localhost:5174/');
-  await blockedPage.waitForFunction(() => window.__insightflow);
-  await blockedPage.click('#primary');
-  await blockedPage.click('#secondary');
+  await blockedPage.waitForFunction(
+    () => window.__insightflow && document.body.dataset.ready === 'true',
+  );
+  await blockedPage.click('#search-button');
+  await blockedPage.click('#search-button');
   await blockedPage.waitForTimeout(250);
   assert.equal(responses.length, 3);
   assert.equal(new Set(responses.map((event) => event.session_id)).size, 1);

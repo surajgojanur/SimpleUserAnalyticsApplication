@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' http://localhost:5000; connect-src 'self' http://localhost:5000; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Collection · Northwind Goods</title>
+    <meta
+      name="description"
+      content="A fictional store for everyday essentials. Demo only, no real orders."
+    />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body data-page="shop">
+    <a class="skip-link" href="#content">Skip to content</a>
+    <div class="announcement">
+      A considered collection for everyday living <span>· Demo store</span>
+    </div>
+    <header class="header">
+      <div class="header-inner">
+        <a class="logo" href="/" aria-label="Northwind Goods home"
+          ><span class="brand-mark" aria-hidden="true">N↗</span>northwind<span class="logo-sub"
+            >GOODS</span
+          ></a
+        >
+        <button
+          class="menu-toggle"
+          aria-expanded="false"
+          aria-controls="main-nav"
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <nav id="main-nav" aria-label="Main navigation">
+          <a href="/shop.html">Shop</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </nav>
+        <form class="search" id="search-form">
+          <label class="sr-only" for="search">Search the collection</label
+          ><input
+            id="search"
+            type="search"
+            placeholder="Find something good"
+            maxlength="60"
+          /><button id="search-button" aria-label="Search">⌕</button>
+        </form>
+        <a class="cart-link" href="/cart.html" aria-label="Cart"
+          >Bag <span data-cart-count aria-live="polite">0</span></a
+        >
+      </div>
+    </header>
+    <main id="content"><section class="wrap section"><p class="eyebrow">The full collection</p><h1>Find your everyday favorite.</h1><p>Eight thoughtful essentials. Browse by category, explore the details, and build a fictional bag.</p><div class="shop-controls"><div class="filters" role="group" aria-label="Filter by category"><button data-filter="All" aria-pressed="true">All</button><button data-filter="Home" aria-pressed="false">Home</button><button data-filter="Everyday" aria-pressed="false">Everyday</button><button data-filter="Tech" aria-pressed="false">Tech</button><button data-filter="Wear" aria-pressed="false">Wear</button></div><label>Sort by <select id="sort"><option value="featured">Featured</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="name">Name</option></select></label></div><p id="results-count" role="status">8 essentials</p><p id="no-results" hidden>No products match your search. Try another word or category.</p><div id="shop-grid" class="product-grid"><article class="product-card" data-category="Tech" data-name="aurora headphones" data-price="12900"><a class="product-art" href="/products/aurora-headphones.html" aria-label="View Aurora Headphones"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M110 170v-25a90 90 0 0 1 180 0v25" fill="none" stroke="#c5aa88" stroke-width="24"/><rect x="92" y="148" width="46" height="87" rx="22"/><rect x="262" y="148" width="46" height="87" rx="22"/></g></svg></a><div class="card-caption"><p class="eyebrow">Tech</p><h3><a href="/products/aurora-headphones.html">Aurora Headphones</a></h3><p>$129.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="aurora-headphones">Add to bag</button></div></article><article class="product-card" data-category="Everyday" data-name="field backpack" data-price="8900"><a class="product-art" href="/products/field-backpack.html" aria-label="View Field Backpack"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#58796b" stroke="#58796b" transform="rotate(0 200 160)"><rect x="123" y="77" width="154" height="181" rx="34"/><path d="M164 84V64h72v20" fill="none" stroke-width="12"/><rect x="145" y="172" width="110" height="62" rx="15" fill="#ffffff44"/></g></svg></a><div class="card-caption"><p class="eyebrow">Everyday</p><h3><a href="/products/field-backpack.html">Field Backpack</a></h3><p>$89.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="field-backpack">Add to bag</button></div></article><article class="product-card" data-category="Home" data-name="slow morning mug" data-price="2400"><a class="product-art" href="/products/ceramic-mug.html" aria-label="View Slow Morning Mug"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M125 102h135v116q0 42-67 42t-68-42Z"/><path d="M259 128h30q40 0 40 41t-68 40" fill="none" stroke-width="18"/><ellipse cx="192" cy="102" rx="67" ry="15" fill="#ffffff66"/></g></svg></a><div class="card-caption"><p class="eyebrow">Home</p><h3><a href="/products/ceramic-mug.html">Slow Morning Mug</a></h3><p>$24.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="ceramic-mug">Add to bag</button></div></article><article class="product-card" data-category="Everyday" data-name="trail bottle" data-price="3200"><a class="product-art" href="/products/trail-bottle.html" aria-label="View Trail Bottle"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#58796b" stroke="#58796b" transform="rotate(0 200 160)"><rect x="166" y="44" width="68" height="28" rx="8" fill="#354451"/><rect x="153" y="70" width="94" height="204" rx="30"/><rect x="155" y="131" width="90" height="77" rx="5" fill="#ffffff33"/></g></svg></a><div class="card-caption"><p class="eyebrow">Everyday</p><h3><a href="/products/trail-bottle.html">Trail Bottle</a></h3><p>$32.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="trail-bottle">Add to bag</button></div></article><article class="product-card" data-category="Home" data-name="sunday linen throw" data-price="6800"><a class="product-art" href="/products/linen-throw.html" aria-label="View Sunday Linen Throw"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M103 82h186l15 175H116Z"/><path d="M130 84l13 170m30-170 13 170m30-170 13 170m30-170 13 170" stroke="#ffffff55" stroke-width="8"/><path d="M119 258v16m19-16v16m19-16v16m19-16v16m19-16v16m19-16v16m19-16v16m19-16v16m19-16v16m19-16v16" stroke-width="4"/></g></svg></a><div class="card-caption"><p class="eyebrow">Home</p><h3><a href="/products/linen-throw.html">Sunday Linen Throw</a></h3><p>$68.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="linen-throw">Add to bag</button></div></article><article class="product-card" data-category="Home" data-name="arc desk lamp" data-price="7900"><a class="product-art" href="/products/desk-lamp.html" aria-label="View Arc Desk Lamp"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M190 248V120q0-58 52-58" fill="none" stroke-width="13"/><path d="M207 101q0-65 65-51l39 68Z"/><ellipse cx="191" cy="254" rx="64" ry="15"/></g></svg></a><div class="card-caption"><p class="eyebrow">Home</p><h3><a href="/products/desk-lamp.html">Arc Desk Lamp</a></h3><p>$79.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="desk-lamp">Add to bag</button></div></article><article class="product-card" data-category="Wear" data-name="weekend canvas sneakers" data-price="5900"><a class="product-art" href="/products/canvas-sneakers.html" aria-label="View Weekend Canvas Sneakers"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M99 153l67-35 54 52 75 28q33 12 24 47H87q-18-30 12-92Z"/><path d="M87 228h233v22H87Z" fill="#f7f2e8"/><path d="m167 148 42-7m-25 28 44-9m-25 29 44-11" stroke="#f7f2e8" stroke-width="7"/></g></svg></a><div class="card-caption"><p class="eyebrow">Wear</p><h3><a href="/products/canvas-sneakers.html">Weekend Canvas Sneakers</a></h3><p>$59.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="canvas-sneakers">Add to bag</button></div></article><article class="product-card" data-category="Wear" data-name="drift merino beanie" data-price="2800"><a class="product-art" href="/products/merino-beanie.html" aria-label="View Drift Merino Beanie"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#be7c64" stroke="#be7c64" transform="rotate(0 200 160)"><path d="M123 208V158a77 77 0 0 1 154 0v50Z"/><rect x="112" y="201" width="176" height="57" rx="14"/><path d="M150 119v80m25-91v91m25-93v93m25-91v91m25-80v80" stroke="#ffffff33" stroke-width="5"/></g></svg></a><div class="card-caption"><p class="eyebrow">Wear</p><h3><a href="/products/merino-beanie.html">Drift Merino Beanie</a></h3><p>$28.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="merino-beanie">Add to bag</button></div></article></div></section><section class="newsletter wrap"><div><p class="eyebrow">The occasional good thing</p><h2>A note for your next slow morning.</h2><p>New arrivals and small ideas for everyday living. This demo does not collect your email.</p></div><form id="newsletter-form"><label for="newsletter-email">Demo email (fixed fictional value)</label><input id="newsletter-email" type="email" value="shopper@example.invalid" readonly><button id="newsletter-submit" class="primary">Join the demo list</button></form></section></main>
+    <p id="feedback" class="toast" role="status" aria-live="polite"></p>
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <a class="logo" href="/">northwind goods</a>
+          <p>Fewer things. Better days.</p>
+          <p class="demo-notice">
+            Demo store, no real orders. All products, reviews, and shopper traffic are fictional.
+          </p>
+        </div>
+        <div>
+          <h2>Explore</h2>
+          <a href="/shop.html">Shop all</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>A little reassurance</h2>
+          <p>Fictional free delivery over $75.</p>
+          <p>Demo returns within 30 days.</p>
+          <p>No payments or personal information.</p>
+        </div>
+      </div>
+      <p class="footer-bottom">Northwind Goods · An InsightFlow Analytics demo</p>
+    </footer>
+    <script type="module" src="/js/store.js"></script>
+    <script async src="http://localhost:5000/sdk/tracker.js" data-site-id="demo_store" data-api-url="http://localhost:5000/api/events"></script>
+  </body>
+</html>

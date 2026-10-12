@@ -1,0 +1,94 @@
+[
+  {
+    "slug": "aurora-headphones",
+    "name": "Aurora Headphones",
+    "category": "Tech",
+    "price": 12900,
+    "description": "A little quiet, wherever the day takes you. Cushioned wireless headphones with a warm, balanced sound.",
+    "details": [
+      "Up to 30 hours of listening",
+      "Soft replaceable ear cushions",
+      "USB-C charging cable included"
+    ],
+    "colors": ["Sand", "Forest", "Ink"],
+    "art": "headphones"
+  },
+  {
+    "slug": "field-backpack",
+    "name": "Field Backpack",
+    "category": "Everyday",
+    "price": 8900,
+    "description": "From your morning commute to the last train home. An easygoing everyday pack with space for what matters.",
+    "details": [
+      "18 litre capacity",
+      "Padded 14 inch laptop pocket",
+      "Recycled water-resistant fabric"
+    ],
+    "colors": ["Forest", "Sand", "Ink"],
+    "art": "backpack"
+  },
+  {
+    "slug": "ceramic-mug",
+    "name": "Slow Morning Mug",
+    "category": "Home",
+    "price": 2400,
+    "description": "Make a small ritual out of your first cup. A generous stoneware mug with a comfortable handle.",
+    "details": ["350 ml capacity", "Dishwasher safe", "Hand-finished matte glaze"],
+    "colors": ["Sand", "Clay", "Forest"],
+    "art": "mug"
+  },
+  {
+    "slug": "trail-bottle",
+    "name": "Trail Bottle",
+    "category": "Everyday",
+    "price": 3200,
+    "description": "Cold water for long walks and hot coffee for early starts. A reusable bottle designed to go everywhere.",
+    "details": ["600 ml insulated steel", "Leak-resistant screw cap", "Hand wash recommended"],
+    "colors": ["Forest", "Clay", "Ink"],
+    "art": "bottle"
+  },
+  {
+    "slug": "linen-throw",
+    "name": "Sunday Linen Throw",
+    "category": "Home",
+    "price": 6800,
+    "description": "A soft layer for the sofa, the reading chair, or the end of a slow afternoon. Woven with an airy, natural texture.",
+    "details": ["130 × 170 cm", "Linen and cotton blend", "Gentle cold machine wash"],
+    "colors": ["Sand", "Clay", "Forest"],
+    "art": "throw"
+  },
+  {
+    "slug": "desk-lamp",
+    "name": "Arc Desk Lamp",
+    "category": "Home",
+    "price": 7900,
+    "description": "Warm light for focused evenings. A simple curved lamp that feels at home on a desk or bedside table.",
+    "details": ["Warm 2700K LED", "Three brightness levels", "Low-energy USB power"],
+    "colors": ["Sand", "Forest", "Ink"],
+    "art": "lamp"
+  },
+  {
+    "slug": "canvas-sneakers",
+    "name": "Weekend Canvas Sneakers",
+    "category": "Wear",
+    "price": 5900,
+    "description": "Comfortable from the first coffee run to the last stroll home. Lightweight canvas with a flexible sole.",
+    "details": [
+      "Breathable cotton canvas",
+      "Cushioned removable footbed",
+      "Sizes are fictional demo options"
+    ],
+    "sizes": ["36", "38", "40", "42", "44"],
+    "art": "sneakers"
+  },
+  {
+    "slug": "merino-beanie",
+    "name": "Drift Merino Beanie",
+    "category": "Wear",
+    "price": 2800,
+    "description": "A pocket-sized bit of warmth. Soft, fine-knit merino with an easy fold-over cuff.",
+    "details": ["Soft merino wool blend", "One relaxed fit", "Hand wash and dry flat"],
+    "colors": ["Clay", "Forest", "Ink"],
+    "art": "beanie"
+  }
+]

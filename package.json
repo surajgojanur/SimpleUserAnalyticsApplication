@@ -15,9 +15,9 @@
     "node": ">=20.19"
   },
   "scripts": {
-    "test": "npm test --prefix apps/api",
+    "test": "npm test --prefix apps/api && npm test --prefix apps/demo-site",
     "lint": "eslint apps packages verification",
-    "build": "npm run build --prefix packages/tracker && npm run build --prefix apps/dashboard",
+    "build": "npm run build --prefix packages/tracker && npm run build --prefix apps/dashboard && npm run build --prefix apps/demo-site",
     "format": "prettier --check apps/api/src apps/api/scripts apps/api/tests apps/dashboard/src apps/demo-site packages/tracker/src verification/*.mjs eslint.config.js"
   }
 }

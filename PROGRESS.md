@@ -106,3 +106,19 @@ Next: phase 7 fresh clone into verification/fresh-clone. Stop original service p
 - Create public GitHub repository and push main; create Atlas cluster/user, Render service, and two Vercel projects; set actual environment variables; replace all demo tracker URLs; update allowed origins via seed; verify hosted flow in Chrome/Firefox; update README live links. No credentials/accounts or hosted results were invented.
 - Local assumptions/limitations and guide corrections are fully documented in README. Requested model/reasoning setting could not be selected through session tools and is not claimed verified.
 - All seven local phases are complete. Do not repeat implementation. For future work read README and git log. If processes are gone, start the three services using README; existing MongoDB on port 27017 was used. Ignored fresh-clone/cache/artifact directories retain verification evidence and are not submission source.
+
+## Northwind store extension — active
+
+The new extension request takes precedence over the earlier finished milestone. Read README, this progress history, all existing tests, and both browser verification scripts before implementation. Tracker and API runtime/contract are unchanged.
+
+### Store/generator completed
+- Generated 15 actual-path pages: home, shop, eight products, cart, checkout, confirmation, about, contact. Removed obsolete /products.html; regression selectors updated to real shop/search/newsletter/promo controls while preserving assertions.
+- Northwind Goods uses local SVG art, one stylesheet, shared vanilla JS, a strict meta CSP, identical one-line tracker tags, and fixed readonly fictional form values. Cart uses integer cents, bounded quantities, validated options, and a separate localStorage key.
+- `npm run build --prefix apps/demo-site`: 15 pages. Generator tests verified all pages and deployment URL/CSP rewriting; source files formatted, generated HTML excluded from formatter because generator output is the authoritative artifact.
+- `node verification/store-browser.mjs` with project-local Chromium: desktop/mobile purchase paths stored 25/26 events with one session each; cart totals $258 → $387 → $258, DEMO10 total $232.20 persisted to checkout; confirmation cleared cart. All 15 pages rendered at desktop/mobile without overflow. Gallery/filter/sort/search/tab/FAQ, buy-now/remove/empty checkout, strict CSP/no offsite requests/no transmitted form data verified.
+- First browser run found malformed cart JSON incorrectly reported as blocked storage. Split storage access errors from JSON/schema errors; rerun passed including the error-state assertion. Storefront screenshot captured and inspected.
+- Store unit checks, lint, format, and whitespace checks passed after formatting package.json (first format attempt flagged that file).
+
+### Remaining work / continuation
+- Historical seed implementation and simulator are in progress. Seed test/run already passed but still needs its own commit/progress evidence. Simulator pilot initially stalled on Playwright keepalive lifecycle completion after navigation; fixed simulator forwarding/waits without changing the tracker; rerun is in progress.
+- Finish simulator pilot and 40-session run; rerun existing browser scripts (stop API before tracker script), API/test/build/lint/format checks; capture dashboard screenshots in docs/screenshots; document flags/generator/seed semantics/deployment; verify a fresh clone; commit remaining steps.

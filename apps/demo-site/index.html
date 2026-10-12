@@ -3,46 +3,87 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Demo Store — Home</title>
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' http://localhost:5000; connect-src 'self' http://localhost:5000; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>Home · Northwind Goods</title>
+    <meta
+      name="description"
+      content="A fictional store for everyday essentials. Demo only, no real orders."
+    />
     <link rel="stylesheet" href="/style.css" />
     <link rel="icon" href="data:," />
   </head>
-  <body>
-    <nav>
-      <strong>Demo Store</strong><a href="/">Home</a><a href="/products.html">Products</a
-      ><a href="/cart.html">Cart</a>
-    </nav>
-    <main>
-      <p>INSIGHTFLOW TRACKING DEMO</p>
-      <h1>Good things, thoughtfully made.</h1>
-      <p>
-        Welcome to our synthetic demo store. Click, navigate, and scroll to generate an analytics
-        journey.
-      </p>
-      <button id="primary" class="primary">Try this button</button
-      ><button id="secondary">Learn more</button>
-      <p id="feedback" aria-live="polite">Ready to explore.</p>
-      <section class="tall">
-        <p>Scroll down to test document coordinates.</p>
+  <body data-page="home">
+    <a class="skip-link" href="#content">Skip to content</a>
+    <div class="announcement">
+      A considered collection for everyday living <span>· Demo store</span>
+    </div>
+    <header class="header">
+      <div class="header-inner">
+        <a class="logo" href="/" aria-label="Northwind Goods home"
+          ><span class="brand-mark" aria-hidden="true">N↗</span>northwind<span class="logo-sub"
+            >GOODS</span
+          ></a
+        >
+        <button
+          class="menu-toggle"
+          aria-expanded="false"
+          aria-controls="main-nav"
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <nav id="main-nav" aria-label="Main navigation">
+          <a href="/shop.html">Shop</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </nav>
+        <form class="search" id="search-form">
+          <label class="sr-only" for="search">Search the collection</label
+          ><input
+            id="search"
+            type="search"
+            placeholder="Find something good"
+            maxlength="60"
+          /><button id="search-button" aria-label="Search">⌕</button>
+        </form>
+        <a class="cart-link" href="/cart.html" aria-label="Cart"
+          >Bag <span data-cart-count aria-live="polite">0</span></a
+        >
+      </div>
+    </header>
+    <main id="content"><section class="hero wrap"><div><p class="eyebrow">Thoughtfully chosen. Everyday loved.</p><h1>Good things.<br>Better everyday.</h1><p>Quiet essentials for the little moments — at home, on the move, and somewhere in between.</p><div class="actions"><a class="button primary" href="/shop.html">Explore the collection</a><a class="button " href="/about.html">Meet Northwind</a></div><p class="hero-note">Made-up goods. A very real analytics journey.</p></div><a href="/products/aurora-headphones.html" class="hero-art" aria-label="Discover Aurora Headphones"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#58796b" stroke="#58796b" transform="rotate(0 200 160)"><path d="M110 170v-25a90 90 0 0 1 180 0v25" fill="none" stroke="#58796b" stroke-width="24"/><rect x="92" y="148" width="46" height="87" rx="22"/><rect x="262" y="148" width="46" height="87" rx="22"/></g></svg><span>The Aurora Collection · From $129</span></a></section>
+  <section class="benefits wrap"><p>↗ Considered everyday essentials</p><p>◇ Thoughtful materials</p><p>✓ Fictional 30-day returns</p></section>
+  <section class="wrap section"><div class="section-heading"><div><p class="eyebrow">The everyday edit</p><h2>Small upgrades. Big favorites.</h2></div><a href="/shop.html">See the full collection →</a></div><div class="product-grid"><article class="product-card" data-category="Tech" data-name="aurora headphones" data-price="12900"><a class="product-art" href="/products/aurora-headphones.html" aria-label="View Aurora Headphones"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M110 170v-25a90 90 0 0 1 180 0v25" fill="none" stroke="#c5aa88" stroke-width="24"/><rect x="92" y="148" width="46" height="87" rx="22"/><rect x="262" y="148" width="46" height="87" rx="22"/></g></svg></a><div class="card-caption"><p class="eyebrow">Tech</p><h3><a href="/products/aurora-headphones.html">Aurora Headphones</a></h3><p>$129.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="aurora-headphones">Add to bag</button></div></article><article class="product-card" data-category="Everyday" data-name="field backpack" data-price="8900"><a class="product-art" href="/products/field-backpack.html" aria-label="View Field Backpack"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#58796b" stroke="#58796b" transform="rotate(0 200 160)"><rect x="123" y="77" width="154" height="181" rx="34"/><path d="M164 84V64h72v20" fill="none" stroke-width="12"/><rect x="145" y="172" width="110" height="62" rx="15" fill="#ffffff44"/></g></svg></a><div class="card-caption"><p class="eyebrow">Everyday</p><h3><a href="/products/field-backpack.html">Field Backpack</a></h3><p>$89.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="field-backpack">Add to bag</button></div></article><article class="product-card" data-category="Home" data-name="slow morning mug" data-price="2400"><a class="product-art" href="/products/ceramic-mug.html" aria-label="View Slow Morning Mug"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#c5aa88" stroke="#c5aa88" transform="rotate(0 200 160)"><path d="M125 102h135v116q0 42-67 42t-68-42Z"/><path d="M259 128h30q40 0 40 41t-68 40" fill="none" stroke-width="18"/><ellipse cx="192" cy="102" rx="67" ry="15" fill="#ffffff66"/></g></svg></a><div class="card-caption"><p class="eyebrow">Home</p><h3><a href="/products/ceramic-mug.html">Slow Morning Mug</a></h3><p>$24.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="ceramic-mug">Add to bag</button></div></article><article class="product-card" data-category="Everyday" data-name="trail bottle" data-price="3200"><a class="product-art" href="/products/trail-bottle.html" aria-label="View Trail Bottle"><svg viewBox="0 0 400 320" aria-hidden="true" focusable="false"><ellipse cx="200" cy="279" rx="107" ry="12" fill="#1f352a12"/><g fill="#58796b" stroke="#58796b" transform="rotate(0 200 160)"><rect x="166" y="44" width="68" height="28" rx="8" fill="#354451"/><rect x="153" y="70" width="94" height="204" rx="30"/><rect x="155" y="131" width="90" height="77" rx="5" fill="#ffffff33"/></g></svg></a><div class="card-caption"><p class="eyebrow">Everyday</p><h3><a href="/products/trail-bottle.html">Trail Bottle</a></h3><p>$32.00 <span class="rating" aria-label="Rated 4.8 out of 5, fictional">★★★★★</span></p><button class="add-card" data-add="trail-bottle">Add to bag</button></div></article></div></section>
+  <section class="wrap section"><p class="eyebrow">Find your kind of good</p><h2>For wherever life happens.</h2><div class="categories"><a href="/shop.html" class="category-tile tone-0" data-category-link="Home"><span aria-hidden="true">⌂</span><h3>Home</h3><p>Explore the home edit →</p></a><a href="/shop.html" class="category-tile tone-1" data-category-link="Everyday"><span aria-hidden="true">↗</span><h3>Everyday</h3><p>Explore the everyday edit →</p></a><a href="/shop.html" class="category-tile tone-2" data-category-link="Tech"><span aria-hidden="true">◉</span><h3>Tech</h3><p>Explore the tech edit →</p></a><a href="/shop.html" class="category-tile tone-3" data-category-link="Wear"><span aria-hidden="true">≈</span><h3>Wear</h3><p>Explore the wear edit →</p></a></div></section>
+  <section class="story-band"><div class="wrap"><p class="eyebrow">Less, but a little better</p><h2>Things that fit your life,<br>not the other way around.</h2><p>We believe the everyday deserves a little care. Meet a fictional store built around useful objects, honest details, and unhurried browsing.</p><a class="button " href="/about.html">Read our story</a></div></section>
+  <section class="wrap section"><p class="eyebrow">Kind words · fictional reviews</p><h2>Made for everyday people.</h2><div class="testimonials"><blockquote>“The mug I reach for every morning.”<cite>— Alex, demo shopper</cite></blockquote><blockquote>“Simple, useful, and a joy to carry.”<cite>— Sam, demo shopper</cite></blockquote><blockquote>“A quieter corner of the internet.”<cite>— Taylor, demo shopper</cite></blockquote></div></section><section class="newsletter wrap"><div><p class="eyebrow">The occasional good thing</p><h2>A note for your next slow morning.</h2><p>New arrivals and small ideas for everyday living. This demo does not collect your email.</p></div><form id="newsletter-form"><label for="newsletter-email">Demo email (fixed fictional value)</label><input id="newsletter-email" type="email" value="shopper@example.invalid" readonly><button id="newsletter-submit" class="primary">Join the demo list</button></form></section></main>
+    <p id="feedback" class="toast" role="status" aria-live="polite"></p>
+    <footer>
+      <div class="footer-grid">
         <div>
-          <h2>You made it to the bottom.</h2>
-          <button id="bottom">Button far down the page</button>
+          <a class="logo" href="/">northwind goods</a>
+          <p>Fewer things. Better days.</p>
+          <p class="demo-notice">
+            Demo store, no real orders. All products, reviews, and shopper traffic are fictional.
+          </p>
         </div>
-      </section>
-    </main>
-    <script>
-      document.querySelectorAll('button').forEach((button) =>
-        button.addEventListener('click', (event) => {
-          event.stopPropagation();
-          document.querySelector('#feedback').textContent = 'Clicked: ' + button.textContent;
-        }),
-      );
-    </script>
-    <script
-      async
-      src="http://localhost:5000/sdk/tracker.js"
-      data-site-id="demo_store"
-      data-api-url="http://localhost:5000/api/events"
-    ></script>
+        <div>
+          <h2>Explore</h2>
+          <a href="/shop.html">Shop all</a><a href="/about.html">Our story</a
+          ><a href="/contact.html">Contact</a>
+        </div>
+        <div>
+          <h2>A little reassurance</h2>
+          <p>Fictional free delivery over $75.</p>
+          <p>Demo returns within 30 days.</p>
+          <p>No payments or personal information.</p>
+        </div>
+      </div>
+      <p class="footer-bottom">Northwind Goods · An InsightFlow Analytics demo</p>
+    </footer>
+    <script type="module" src="/js/store.js"></script>
+    <script async src="http://localhost:5000/sdk/tracker.js" data-site-id="demo_store" data-api-url="http://localhost:5000/api/events"></script>
   </body>
 </html>
