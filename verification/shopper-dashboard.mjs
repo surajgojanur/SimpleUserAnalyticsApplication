@@ -21,7 +21,10 @@ assert.deepEqual(
   journey.events.map((event) => event.timestamp),
   journey.events.map((event) => event.timestamp).toSorted(),
 );
-const browser = await chromium.launch({ channel: 'chromium' });
+const browser = await chromium.launch({
+  channel: 'chromium',
+  executablePath: process.env.CHROME_PATH,
+});
 const errors = [];
 try {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

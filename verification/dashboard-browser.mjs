@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
-const browser = await chromium.launch({ headless: true, channel: 'chromium' });
+const browser = await chromium.launch({
+  headless: true,
+  channel: 'chromium',
+  executablePath: process.env.CHROME_PATH,
+});
 const errors = [];
 async function pageWith(routes = []) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

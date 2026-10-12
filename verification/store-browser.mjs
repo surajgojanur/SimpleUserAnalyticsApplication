@@ -7,7 +7,11 @@ const mongoose = require('mongoose');
 const products = JSON.parse(
   await readFile(new URL('../apps/demo-site/data/products.json', import.meta.url)),
 );
-const browser = await chromium.launch({ headless: true, channel: 'chromium' });
+const browser = await chromium.launch({
+  headless: true,
+  channel: 'chromium',
+  executablePath: process.env.CHROME_PATH,
+});
 const errors = [];
 const unexpected = [];
 async function ready(page) {
@@ -34,7 +38,7 @@ async function stored(session, paths) {
   throw new Error('Purchase page views missing in MongoDB');
 }
 try {
-  await mongoose.connect('mongodb://127.0.0.1:27017/insightflow');
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/insightflow');
   await mkdir(new URL('../docs/screenshots/', import.meta.url), { recursive: true });
   for (const mobile of [false, true]) {
     const context = await browser.newContext({

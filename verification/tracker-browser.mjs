@@ -5,7 +5,11 @@ import { chromium } from 'playwright';
 const require = createRequire(new URL('../apps/api/package.json', import.meta.url));
 const mongoose = require('mongoose');
 const root = new URL('../', import.meta.url).pathname;
-const browser = await chromium.launch({ headless: true, channel: 'chromium' });
+const browser = await chromium.launch({
+  headless: true,
+  channel: 'chromium',
+  executablePath: process.env.CHROME_PATH,
+});
 let server;
 async function startServer() {
   server = spawn(process.execPath, ['src/server.js'], { cwd: root + 'apps/api', stdio: 'pipe' });
@@ -36,7 +40,7 @@ async function waitCount(session, count) {
   throw new Error(`Missing events for ${session}`);
 }
 try {
-  await mongoose.connect('mongodb://127.0.0.1:27017/insightflow');
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/insightflow');
   await startServer();
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await context.newPage();

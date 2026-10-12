@@ -2,6 +2,7 @@ services:
   - type: web
     name: insightflow-api
     runtime: node
+    branch: main
     plan: free
     rootDir: apps/api
     buildCommand: npm ci --omit=dev
@@ -9,7 +10,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: '20'
+        value: '22.23.1'
       - key: NODE_ENV
         value: production
       - key: PORT
