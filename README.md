@@ -150,7 +150,7 @@ Terminal C, from the repository root:
 python3 -m http.server 5174 --directory apps/demo-site
 ```
 
-Open `http://localhost:5174`, click and scroll, then reload `http://localhost:5173`. Select a session button to see its journey. Open Heatmap, choose a page, and switch Display to Dots. Reads are on-demand; reload the dashboard for newly collected events.
+Wait until Terminal A prints `API listening on 5000` and Terminal B prints Vite’s ready message before making requests. Open `http://localhost:5174`, click and scroll, then reload `http://localhost:5173`. Select a session button to see its journey. Open Heatmap, choose a page, and switch Display to Dots. Reads are on-demand; reload the dashboard for newly collected events.
 
 ### 6. Verify and build
 

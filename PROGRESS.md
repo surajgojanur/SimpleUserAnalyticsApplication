@@ -9,13 +9,13 @@ The complete 34-page PDF in docs was read before writing code. The assignment wi
 - Original guide retained, with extracted text for review.
 
 ## Phase status
-1. Backend: in progress.
-2. Tracker/demo: pending.
-3. Dashboard: pending.
-4. Tests: pending.
-5. Quality: pending.
-6. Documentation/deployment preparation: pending.
-7. Fresh clone: pending.
+1. Backend: completed.
+2. Tracker/demo: completed.
+3. Dashboard: completed.
+4. Tests: completed.
+5. Quality: completed.
+6. Documentation/deployment preparation: completed.
+7. Fresh clone: in progress.
 
 ## Continuation
 Read this file and git log first. Run only checks appropriate to the current phase; do not repeat completed implementation. Local ignored .env files use synthetic/local settings. Deployment and public GitHub publication require human accounts and credentials and will be documented as MANUAL STEPS.
@@ -77,3 +77,11 @@ Next: phase 6 README and deployment notes, followed by a real fresh clone inside
 - Parsed both Vercel JSON files, checked README coverage, lint and diff whitespace checks passed. Provider deployments are not executed and cannot be claimed validated.
 
 Next: phase 7 fresh clone into verification/fresh-clone. Stop original service processes to avoid port collisions. Follow README commands only, using existing local MongoDB; install all packages with npm ci from their own directories, seed, run services, smoke/tests/build/lint, tracker/browser QA. Record actual results and fixes.
+
+
+## Phase 7 intermediate evidence
+- Fresh clone at 0c76874 under verification/fresh-clone, independent node_modules/cache/env copies; installed only using README commands. Existing MongoDB used as documented.
+- npm ci succeeded in all five package directories (root/API/dashboard/tracker/verification); seeded 30 sessions / 358 events.
+- In clone: npm test 39/39, lint, format, tracker/dashboard build, secret scan (7 commits/98 text blobs), clean Git diff all passed. Bundle rebuild produced no changes.
+- Started cloned API via npm run dev, cloned dashboard on 5173, cloned demo on 5174. First immediate curl attempt raced startup and failed to connect. After API listening message, all curl smoke assertions passed. README now explicitly says to wait for server readiness.
+- Browser download into clone-local .cache is in progress; tracker and dashboard browser verification still required before marking phase 7 complete.
