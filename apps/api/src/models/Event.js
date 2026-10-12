@@ -1,9 +1,15 @@
 import mongoose from 'mongoose';
-const clickSchema = new mongoose.Schema({
-  x: Number, y: Number,
-  viewport_width: Number, viewport_height: Number,
-  document_width: Number, document_height: Number,
-}, { _id: false });
+const clickSchema = new mongoose.Schema(
+  {
+    x: Number,
+    y: Number,
+    viewport_width: Number,
+    viewport_height: Number,
+    document_width: Number,
+    document_height: Number,
+  },
+  { _id: false },
+);
 const schema = new mongoose.Schema({
   site_id: { type: String, required: true },
   event_id: { type: String, required: true },

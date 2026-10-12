@@ -13,7 +13,8 @@ const sitePath = (id) => `/api/sites/${encodeURIComponent(id)}`;
 export const api = {
   sites: (signal) => get('/api/sites', {}, signal),
   sessions: (siteId, params, signal) => get(`${sitePath(siteId)}/sessions`, params, signal),
-  sessionEvents: (siteId, id, signal) => get(`${sitePath(siteId)}/sessions/${encodeURIComponent(id)}/events`, {}, signal),
+  sessionEvents: (siteId, id, signal) =>
+    get(`${sitePath(siteId)}/sessions/${encodeURIComponent(id)}/events`, {}, signal),
   pages: (siteId, signal) => get(`${sitePath(siteId)}/pages`, {}, signal),
   heatmap: (siteId, url, signal) => get(`${sitePath(siteId)}/heatmap`, { url }, signal),
 };

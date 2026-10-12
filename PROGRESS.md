@@ -56,3 +56,16 @@ Next: phase 4 API integration/validator tests, against a separate _test database
 - Tests require a database ending in _test distinct from MONGODB_URI, clean it between cases, and drop only that database on completion.
 
 Next: phase 5 quality review, dependency advisories, lint, and secret/history checks.
+
+## Phase 5 completed
+- Re-read implementation and verification code; formatted source consistently. Fixed seed loop to sample click count once per page, rejected non-HTTP(S) seed origins, and retained Express's four-argument error-handler signature.
+- Removed nodemon in favor of Node --watch; updated Vitest to 4.1.11 and explicitly selected Vite 6 for Node 20 compatibility. npm 10 crashed repeatedly with `Cannot read properties of null (reading edgesOut)` while resolving optional Vitest devtools peers, including a clean install. apps/api/.npmrc uses legacy-peer-deps; a fresh install then succeeded. Required versions are locked and verified. Install API from its directory so project npm settings apply.
+- `npm test`: 39/39 pass using updated Vitest.
+- `npm run lint`, `npm run format`, `npm run build`, `git diff --check`: passed. Root scripts are convenience wrappers, not workspaces.
+- Full `npm audit` in root, API, dashboard, tracker, verification: all reported 0 vulnerabilities.
+- `python3 verification/secrets.py`: scanned 5 commits/55 unique text blobs with no recognized secrets or tracked .env/node_modules. Pattern scan is limited to known token/private-key/credential URL formats; .env files checked excluded. Source review found no credentials.
+- No TODO/FIXME/template asset references. Built tracker regenerated without changing its committed bytes.
+- `npm run seed -- --reset`: 30 sessions/393 events; invalid FTP seed origin exits 1 before DB access.
+- Strengthened browser verification checks exact event-count cell, rendered timestamps/types, alternate page URL selection, and rejects all unexpected console errors. Rerun after seed/formatting: passed.
+
+Next: phase 6 README and deployment notes, followed by a real fresh clone inside verification/fresh-clone (ignored).

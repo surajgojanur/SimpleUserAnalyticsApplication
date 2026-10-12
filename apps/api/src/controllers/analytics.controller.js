@@ -10,7 +10,9 @@ const pagination = z.object({
 async function requireSite(id) {
   if (!(await Site.exists({ _id: id }))) throw httpError(404, 'Site not found');
 }
-export async function sites(req, res) { res.json({ sites: await Site.find().sort({ name: 1, _id: 1 }).select('name').lean() }); }
+export async function sites(req, res) {
+  res.json({ sites: await Site.find().sort({ name: 1, _id: 1 }).select('name').lean() });
+}
 export async function sessions(req, res) {
   await requireSite(req.params.siteId);
   const { page, limit } = pagination.parse(req.query);
