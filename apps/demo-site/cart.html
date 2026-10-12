@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo Store — Cart</title><link rel="stylesheet" href="/style.css"><link rel="icon" href="data:,"></head>
+<body><nav><strong>Demo Store</strong><a href="/">Home</a><a href="/products.html">Products</a><a href="/cart.html">Cart</a></nav>
+<main><p>INSIGHTFLOW TRACKING DEMO</p><h1>Your demo cart.</h1><p>A simple final stop in the journey. No orders or payments are processed.</p>
+<button id="primary" class="primary">Try this button</button><button id="secondary">Learn more</button>
+<p id="feedback" aria-live="polite">Ready to explore.</p>
+<section class="tall"><p>Scroll down to test document coordinates.</p><div><h2>You made it to the bottom.</h2><button id="bottom">Button far down the page</button></div></section>
+</main><script>document.querySelectorAll('button').forEach(button => button.addEventListener('click', event => { event.stopPropagation(); document.querySelector('#feedback').textContent = 'Clicked: ' + button.textContent; }));</script>
+<script async src="http://localhost:5000/sdk/tracker.js" data-site-id="demo_store" data-api-url="http://localhost:5000/api/events"></script>
+</body></html>

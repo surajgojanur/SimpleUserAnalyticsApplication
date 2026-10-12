@@ -28,3 +28,13 @@ Read this file and git log first. Run only checks appropriate to the current pha
 - npm audit detected development dependency advisories; resolve during quality phase before final verification.
 
 Next: phase 2 tracker/demo. API process currently running; local MongoDB is available. No external credentials needed for local work.
+
+## Phase 2 completed
+- `npm run build --prefix packages/tracker`: esbuild generated 1.6 KB bundle, committed at apps/api/public/tracker.js.
+- Demo served using `python3 -m http.server 5174 --directory apps/demo-site`.
+- Installed Playwright locally and Chromium inside .cache/browsers. First browser attempt preceded completion of the headless-shell download and failed; switched to the already downloaded full Chromium channel and reran successfully.
+- `PLAYWRIGHT_BROWSERS_PATH=$PWD/.cache/browsers node verification/tracker-browser.mjs`: PASS. Queried actual MongoDB events: page views and capture-phase clicks, same session through home/products/cart and reload, normalized URLs, scrolled click y=2054, 31-minute timestamp edit rotates session, blocked storage keeps an in-memory session.
+- Browser script actually stopped its API process, clicked a working host button, and confirmed no page errors. Network failure messages are browser diagnostics, not uncaught host exceptions.
+- Guide fixes: all future tracker callbacks guarded individually; corrupt stored session data rejected; demo bottom button placed at the bottom. Optional SPA history monkey patch omitted to keep assignment scope small; full navigation supported.
+
+Next: phase 3 dashboard. Demo server remains on 5174. API verification script shuts down its own server; start API again for dashboard checks.

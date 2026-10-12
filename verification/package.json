@@ -1,0 +1,1 @@
+{"name":"insightflow-verification","private":true,"type":"module","scripts":{"tracker":"node tracker-browser.mjs","dashboard":"node dashboard-browser.mjs"},"devDependencies":{"playwright":"^1.64.0"}}
