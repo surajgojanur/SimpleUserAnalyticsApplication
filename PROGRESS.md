@@ -107,7 +107,7 @@ Next: phase 7 fresh clone into verification/fresh-clone. Stop original service p
 - Local assumptions/limitations and guide corrections are fully documented in README. Requested model/reasoning setting could not be selected through session tools and is not claimed verified.
 - All seven local phases are complete. Do not repeat implementation. For future work read README and git log. If processes are gone, start the three services using README; existing MongoDB on port 27017 was used. Ignored fresh-clone/cache/artifact directories retain verification evidence and are not submission source.
 
-## Northwind store extension — active
+## Northwind store extension — completed
 
 The new extension request takes precedence over the earlier finished milestone. Read README, this progress history, all existing tests, and both browser verification scripts before implementation. Tracker and API runtime/contract are unchanged.
 
@@ -119,7 +119,7 @@ The new extension request takes precedence over the earlier finished milestone. 
 - First browser run found malformed cart JSON incorrectly reported as blocked storage. Split storage access errors from JSON/schema errors; rerun passed including the error-state assertion. Storefront screenshot captured and inspected.
 - Store unit checks, lint, format, and whitespace checks passed after formatting package.json (first format attempt flagged that file).
 
-### Remaining work / continuation
+### Earlier checkpoint (superseded by completion below)
 - Historical seed implementation and simulator are in progress. Seed test/run already passed but still needs its own commit/progress evidence. Simulator pilot initially stalled on Playwright keepalive lifecycle completion after navigation; fixed simulator forwarding/waits without changing the tracker; rerun is in progress.
 - Finish simulator pilot and 40-session run; rerun existing browser scripts (stop API before tracker script), API/test/build/lint/format checks; capture dashboard screenshots in docs/screenshots; document flags/generator/seed semantics/deployment; verify a fresh clone; commit remaining steps.
 
@@ -160,3 +160,31 @@ Continuation: documentation is ready for fresh-clone verification. Clone into pr
 
 ### Final storefront checklist adjustment
 - Replaced the header’s text-only bag control with a local inline SVG bag icon and the existing live count, retaining its accessible Cart label and selectors. Corrected footer delivery copy to match the always-free fake checkout. Regenerated all pages; generator/cart/simulator unit tests 5/5, lint and formatting passed. Remaining clone-local browser checks will verify responsive layout after this small adjustment.
+
+### README-only fresh clone completed
+- Cloned source into ignored project-local `.cache/store-fresh-clone` at 9a7ca7b; npm ci independently installed API/dashboard/tracker/demo/root/verification dependencies, env examples were copied, and full Chromium was downloaded into clone-local .cache using the documented --no-shell command. No dependencies, env files or browser cache were copied from the original checkout. Used the existing local MongoDB as allowed by README.
+- `npm run seed` without reset inserted 0 of 436 historical events and preserved all simulated traffic. Started clone API/dashboard/demo at the documented ports; readiness messages and HTTP 200 confirmed.
+- Followed README generator commands with DEMO_API_URL=https://your-api.onrender.com: all 15 pages had the correct SDK/API/CSP origin. Restoring defaults reproduced committed HTML byte-for-byte; rebuilt tracker also matched Git exactly.
+- Clone simulator `--sessions 5 --base-url http://localhost:5174 --concurrency 2 --seed 42`: five completed, buyer 3/researcher 2, 119 accepted events, zero failures/429s, peak 112/minute.
+- Clone tracker regression: actual MongoDB ingestion, session persistence/rotation, capture-phase, URL normalization, scroll y=2800, stopped API, blocked storage and zero page errors passed.
+- Clone fast-forwarded the final icon/footer adjustment to 3a71f03 before the remaining checks. One fetch was accidentally issued in the original checkout, which has no origin (`fatal: 'origin' does not appear to be a git repository`); reran from the clone against its local source origin successfully. No public remote exists yet.
+- Clone store browser check: desktop/mobile 25/26-event purchase paths, cross-tab cart/discount/empty checkout, all 15 page layouts, responsive icon/menu, no offsite assets/form data or console/page errors passed. Refreshed storefront image copied back and visually inspected.
+- Both clone dashboard checks passed: all original loading/empty/error states and canvas assertions; new check saw 109 sessions, 15 URLs, an ordered 54-event journey and 132 product clicks with both devices. Clone dashboard screenshots are preserved locally; committed dashboard screenshots retain the original 40-session workload capture.
+- Clone final `npm test` (41 API + 5 demo), `npm run lint`, `npm run format`, `npm run build`, health/curl smoke, and secret scan passed. Six package audits reported zero vulnerabilities. Secret scan before final evidence commit: 16 commits/174 unique text blobs. Builds were clean before intentional screenshot refresh; those data-dependent image changes are documented.
+- Stopped clone servers and restored original API/dashboard/demo. No tracker/API runtime contract or dashboard implementation changed: `git diff --exit-code 5b11d91 -- packages/tracker apps/api/src apps/api/public/tracker.js apps/dashboard/src` passed.
+
+### Extension definition of done — all local items verified
+1. Store: 15 real-path pages, desktop/mobile rendering and interactions, local assets/CSP, persistent cart/cents/promo/empty/error, and fake checkout verified by store-browser.mjs plus cart tests.
+2. Generator: all pages from the shared catalog/template, identical tracker tags, default/deployment URL rewriting and deterministic output verified by unit tests and executed clone builds.
+3. Simulator: 40 visits/667 stored events/all five personas/43 tracker sessions/zero failures or 429s; headed and documented flags executed. Timestamp, coordinate and per-session API/MongoDB counts checked. Backoff behavior tested with controlled clock; no live 429 occurred and none is claimed exercised.
+4. Dashboard: pagination, long journeys, 15-page selector, tall product heatmap pixels/modes/device filters and responsive width passed, with zero unexpected errors. Four screenshots are committed under docs/screenshots and linked in README.
+5. Seed: 30 historical sessions/436 events; all new paths, device mix and 30→21→12→5→2 funnel covered; repeat seeding inserts 0 and reset remains site-scoped.
+6. Regression/quality: all 46 automated tests, all four browser scripts, API smoke, lint, format, builds, whitespace, audits and history secret-pattern checks passed. Changes are in small meaningful commits. Secret pattern scanning cannot prove absence of every possible secret format.
+7. Docs/fresh clone: README commands independently installed and ran the store, generator, API, simulator and dashboard; PROGRESS records outcomes/fixes. No provider hosting or Firefox/hardware mobile validation is claimed.
+
+### Final handoff / MANUAL STEPS
+- Push the committed project to a public GitHub repository (create it/set remote if absent).
+- Create or configure Atlas, Render API and Vercel dashboard/demo projects, with the README's ordered environment variables. Demo builds use npm ci / npm run build and DEMO_API_URL pointing to the HTTPS Render origin. Rerun local seed against Atlas with the actual demo origin first in DEMO_ORIGINS to update allowed_origins and historical page URLs.
+- Verify the hosted flow in Chrome/Firefox, update live-link placeholders, and account for Render cold starts. Credentials/accounts and hosted validation remain human work.
+- Limitations: fictional products/reviews/fixed checkout values; synthetic traffic; approximate heatmap across layouts; simulator only targets local controlled origins and uses a shared pacing layer; event loss remains possible under API/network failure because the SDK has no retry queue. Blocked cart storage only lasts within the current page.
+- Local extension is complete; no implementation or 40-session simulation needs repeating. If processes are gone, follow README to restart MongoDB/API/dashboard/demo. Review docs/simulation-report.json, screenshots and git log. Clone/cache/raw verification artifacts are ignored and kept entirely inside this project.
