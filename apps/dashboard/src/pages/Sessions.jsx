@@ -12,12 +12,14 @@ export default function Sessions({ siteId }) {
       (signal) => api.sessions(siteId, { page, limit: pageSize }, signal),
       [siteId, page],
     ),
+    { refreshMs: 15000 },
   );
   const journey = useAsync(
     useCallback(
       (signal) => (selected ? api.sessionEvents(siteId, selected, signal) : null),
       [siteId, selected],
     ),
+    { refreshMs: 15000 },
   );
   const totalPages = Math.max(1, Math.ceil((list.data?.total || 0) / pageSize));
   function changePage(next) {
@@ -30,7 +32,7 @@ export default function Sessions({ siteId }) {
         <p className="eyebrow">Visitor activity</p>
         <h2 className="mt-1 text-2xl font-semibold">Sessions</h2>
         <p className="mt-2 text-sm text-slate-500">
-          Explore event counts and follow each visitor’s ordered journey.
+          Explore event counts and follow each visitor’s ordered journey. Refreshes every 15 seconds while this tab is visible.
         </p>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-2">
