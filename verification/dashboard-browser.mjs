@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
+const apiOrigin = process.env.API_URL || 'http://localhost:5000';
+const dashboardOrigin = process.env.DASHBOARD_URL || 'http://localhost:5173';
 const browser = await chromium.launch({
   headless: true,
   channel: 'chromium',
@@ -18,7 +20,7 @@ async function pageWith(routes = []) {
       await new Promise((resolve) => setTimeout(resolve, 400));
       await route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body) });
     });
-  await page.goto('http://localhost:5173');
+  await page.goto(dashboardOrigin);
   return page;
 }
 async function visible(page, text) {
@@ -35,9 +37,7 @@ try {
     .waitFor();
   const first = page.getByRole('button', { name: /^View session / }).first();
   const sid = (await first.getAttribute('aria-label')).replace('View session ', '');
-  const list = await (
-    await fetch('http://localhost:5000/api/sites/demo_store/sessions?limit=10')
-  ).json();
+  const list = await (await fetch(`${apiOrigin}/api/sites/demo_store/sessions?limit=10`)).json();
   assert.equal(
     await first.locator('xpath=ancestor::tr').locator('td').nth(1).innerText(),
     String(list.sessions[0].event_count),
@@ -45,7 +45,7 @@ try {
   await first.click();
   await page.getByRole('list', { name: 'Ordered user journey' }).waitFor();
   const journey = await (
-    await fetch(`http://localhost:5000/api/sites/demo_store/sessions/${sid}/events`)
+    await fetch(`${apiOrigin}/api/sites/demo_store/sessions/${sid}/events`)
   ).json();
   assert.equal(
     await page.getByRole('list', { name: 'Ordered user journey' }).locator('li').count(),
@@ -71,7 +71,7 @@ try {
   await page.getByRole('img', { name: /^Click heatmap showing/ }).waitFor();
   const url = await page.getByLabel('Page URL', { exact: true }).inputValue();
   const heatmap = await (
-    await fetch(`http://localhost:5000/api/sites/demo_store/heatmap?url=${encodeURIComponent(url)}`)
+    await fetch(`${apiOrigin}/api/sites/demo_store/heatmap?url=${encodeURIComponent(url)}`)
   ).json();
   await page.getByLabel('Display', { exact: true }).selectOption('dots');
   await page
@@ -105,9 +105,7 @@ try {
     .getAttribute('value');
   await page.getByLabel('Page URL', { exact: true }).selectOption(otherUrl);
   const otherMap = await (
-    await fetch(
-      `http://localhost:5000/api/sites/demo_store/heatmap?url=${encodeURIComponent(otherUrl)}`,
-    )
+    await fetch(`${apiOrigin}/api/sites/demo_store/heatmap?url=${encodeURIComponent(otherUrl)}`)
   ).json();
   await page
     .getByRole('img', { name: `Click dots showing ${otherMap.clicks.length} clicks` })

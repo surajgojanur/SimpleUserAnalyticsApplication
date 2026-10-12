@@ -2,6 +2,12 @@ import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
 import { mkdir, readFile } from 'node:fs/promises';
+import { resolve, join } from 'node:path';
+const storeOrigin = process.env.STORE_URL || 'http://localhost:5174';
+const apiOrigin = process.env.API_URL || 'http://localhost:5000';
+const screenshotDir = process.env.SCREENSHOT_DIR
+  ? resolve(process.env.SCREENSHOT_DIR)
+  : new URL('../docs/screenshots/', import.meta.url).pathname;
 const require = createRequire(new URL('../apps/api/package.json', import.meta.url));
 const mongoose = require('mongoose');
 const products = JSON.parse(
@@ -27,8 +33,7 @@ async function stored(session, paths) {
     if (
       paths.every((path) =>
         events.some(
-          (event) =>
-            event.event_type === 'page_view' && event.page_url === 'http://localhost:5174' + path,
+          (event) => event.event_type === 'page_view' && event.page_url === storeOrigin + path,
         ),
       )
     )
@@ -39,7 +44,7 @@ async function stored(session, paths) {
 }
 try {
   await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/insightflow');
-  await mkdir(new URL('../docs/screenshots/', import.meta.url), { recursive: true });
+  await mkdir(screenshotDir, { recursive: true });
   for (const mobile of [false, true]) {
     const context = await browser.newContext({
       viewport: mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 },
@@ -48,8 +53,7 @@ try {
     });
     context.on('request', (request) => {
       const url = new URL(request.url());
-      if (!['http://localhost:5174', 'http://localhost:5000'].includes(url.origin))
-        unexpected.push(request.url());
+      if (![storeOrigin, apiOrigin].includes(url.origin)) unexpected.push(request.url());
       if (request.method() === 'POST') {
         assert.equal(url.pathname, '/api/events');
         const data = JSON.parse(request.postData());
@@ -61,11 +65,11 @@ try {
     page.on('console', (message) => {
       if (message.type() === 'error') errors.push(message.text());
     });
-    await page.goto('http://localhost:5174/?discarded=yes#start');
+    await page.goto(storeOrigin + '/?discarded=yes#start');
     await ready(page);
     if (!mobile)
       await page.screenshot({
-        path: new URL('../docs/screenshots/storefront.png', import.meta.url).pathname,
+        path: join(screenshotDir, 'storefront.png'),
         fullPage: true,
       });
     const session = await page.evaluate(
@@ -164,7 +168,7 @@ try {
       '/contact.html',
       ...products.map((product) => `/products/${product.slug}.html`),
     ]) {
-      await page.goto('http://localhost:5174' + path);
+      await page.goto(storeOrigin + path);
       await ready(page);
       assert(
         await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
@@ -177,15 +181,15 @@ try {
           .then((text) => text.includes('Demo store, no real orders')),
       );
     }
-    await page.goto('http://localhost:5174/cart.html');
+    await page.goto(storeOrigin + '/cart.html');
     await ready(page);
     assert(await page.getByText('Your bag is waiting for a little good.').isVisible());
     assert.equal(await page.locator('#checkout-link').getAttribute('aria-disabled'), 'true');
-    await page.goto('http://localhost:5174/checkout.html');
+    await page.goto(storeOrigin + '/checkout.html');
     await ready(page);
     assert(await page.locator('#place-order').isDisabled());
     // Buy-now is a real client-side path to the same fake checkout.
-    await page.goto('http://localhost:5174/products/ceramic-mug.html');
+    await page.goto(storeOrigin + '/products/ceramic-mug.html');
     await ready(page);
     await page.click('#buy-now');
     await page.waitForURL('**/checkout.html');
@@ -193,7 +197,7 @@ try {
     assert.match(await page.locator('#checkout-summary').innerText(), /\$24\.00/);
     // A second tab must update an open checkout, including its empty state.
     const otherTab = await context.newPage();
-    await otherTab.goto('http://localhost:5174/cart.html');
+    await otherTab.goto(storeOrigin + '/cart.html');
     await ready(otherTab);
     await otherTab.locator('[data-cart-step="1"]').click();
     await page.waitForFunction(() =>
@@ -208,10 +212,10 @@ try {
     await page.waitForFunction(() => document.querySelector('#place-order').disabled);
     assert.match(await page.locator('#checkout-summary').innerText(), /Your bag is empty/);
     await otherTab.close();
-    await page.goto('http://localhost:5174/products/ceramic-mug.html');
+    await page.goto(storeOrigin + '/products/ceramic-mug.html');
     await ready(page);
     await page.click('#add-to-cart');
-    await page.goto('http://localhost:5174/cart.html');
+    await page.goto(storeOrigin + '/cart.html');
     await ready(page);
     await page.locator('[data-remove]').click();
     assert(await page.getByText('Your bag is waiting for a little good.').isVisible());
@@ -223,7 +227,7 @@ try {
   const broken = await browser.newContext();
   await broken.addInitScript(() => localStorage.setItem('northwind-goods:cart:v1', '{bad'));
   const badPage = await broken.newPage();
-  await badPage.goto('http://localhost:5174/cart.html');
+  await badPage.goto(storeOrigin + '/cart.html');
   await ready(badPage);
   assert.match(await badPage.locator('#feedback').innerText(), /Saved cart is invalid/);
   await broken.close();

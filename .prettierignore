@@ -1,3 +1,4 @@
 # Generated HTML is reproduced byte-for-byte by the store generator.
 apps/demo-site/*.html
 apps/demo-site/products/*.html
+**/dist/

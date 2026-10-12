@@ -1,13 +1,13 @@
 # InsightFlow Analytics
 
-A complete User Analytics hiring assignment for CausalFunnel: a one-tag JavaScript tracker, an Express/MongoDB API, and a React dashboard for session journeys and click heatmaps. The demo store and seed data are synthetic. Local implementation and verification are complete; public publishing and hosted verification remain manual.
+A complete User Analytics hiring assignment for CausalFunnel: a one-tag JavaScript tracker, an Express/MongoDB API, and a React dashboard for session journeys and click heatmaps. The demo store and seed data are synthetic. Local implementation and verification are complete. The production deployment procedure and verification limits are recorded in [Netlify deployment](docs/NETLIFY_DEPLOYMENT.md).
 
 | Link | Status |
 | --- | --- |
-| Public GitHub repository | MANUAL: create repository and replace this placeholder |
-| Dashboard | MANUAL: `https://<dashboard>.vercel.app` |
-| Demo store | MANUAL: `https://<demo>.vercel.app` |
-| API | MANUAL: `https://<api>.onrender.com` |
+| GitHub repository | https://github.com/surajgojanur/SimpleUserAnalyticsApplication |
+| Dashboard | Actual assigned Netlify URL required |
+| Demo store | https://insightflow-store.netlify.app |
+| API | https://insightflow-api-re52.onrender.com |
 | Local dashboard / demo / API | `http://localhost:5173` / `http://localhost:5174` / `http://localhost:5000` |
 
 ## Features
@@ -153,7 +153,7 @@ npm run dev
 Terminal C, from the repository root:
 
 ```bash
-python3 -m http.server 5174 --directory apps/demo-site
+python3 -m http.server 5174 --directory apps/demo-site/dist
 ```
 
 Wait until Terminal A prints `API listening on 5000` and Terminal B prints Vite’s ready message before making requests. Open `http://localhost:5174`, click and scroll, then reload `http://localhost:5173`. Select a session button to see its journey. Open Heatmap, choose a page, and switch Display to Dots. Reads are on-demand; reload the dashboard for newly collected events.
@@ -216,21 +216,21 @@ The original dashboard check uses live seed data plus intercepted responses for 
 
 ## Northwind Goods demo store
 
-The committed HTML works immediately with the Python server; no browser framework or build step is required to serve it. Pages are `/`, `/shop.html`, `/cart.html`, `/checkout.html`, `/order-confirmation.html`, `/about.html`, `/contact.html`, and eight `/products/<slug>.html` pages: `aurora-headphones`, `field-backpack`, `ceramic-mug`, `trail-bottle`, `linen-throw`, `desk-lamp`, `canvas-sneakers`, `merino-beanie`.
+Run the Node generator once, then serve `apps/demo-site/dist` with the Python server. The store remains plain HTML/CSS/JavaScript with no browser framework. Pages are `/`, `/shop.html`, `/cart.html`, `/checkout.html`, `/order-confirmation.html`, `/about.html`, `/contact.html`, and eight `/products/<slug>.html` pages: `aurora-headphones`, `field-backpack`, `ceramic-mug`, `trail-bottle`, `linen-throw`, `desk-lamp`, `canvas-sneakers`, `merino-beanie`.
 
 Shop category/search filters and sorting stay on the same pathname. Product pages have local SVG galleries, colors/sizes, quantities, tabs, FAQs and related products. The bag persists across pages; prices use integer cents, quantities are capped at 20 per variant, and DEMO10 gives a rounded 10% discount. Checkout only previews fixed fictional details and clears the bag on confirmation. The footer makes clear that no real orders exist.
 
-`apps/demo-site/data/products.json` is the single product source (prices in cents). `scripts/build.js` and `templates/page.html` generate **all** pages, keeping header/footer/tracker/CSP consistent. After changing data or templates, regenerate and commit the HTML:
+`apps/demo-site/data/products.json` is the single product source (prices in cents). `scripts/build.js` and `templates/page.html` generate **all** pages, keeping header/footer/tracker/CSP consistent. After changing data or templates, build the clean `apps/demo-site/dist` output. The committed source HTML is a local snapshot; deployment publishes only `dist`, and generated output is not committed. See [Netlify deployment](docs/NETLIFY_DEPLOYMENT.md) for the current production pipeline:
 
 ```bash
 npm run build --prefix apps/demo-site
 # Deployment example: origin only, no /api suffix or trailing path
-DEMO_API_URL=https://your-api.onrender.com npm run build --prefix apps/demo-site
-# Restore localhost HTML before local QA
+NETLIFY=true DEMO_API_URL=https://insightflow-api-re52.onrender.com npm run build --prefix apps/demo-site
+# Rebuild dist for localhost before local QA
 npm run build --prefix apps/demo-site
 ```
 
-`DEMO_API_URL` defaults to `http://localhost:5000`. Its value must be an HTTP(S) origin without credentials, query, hash or path. It rewrites both tracker attributes and the restrictive meta CSP. The site uses system fonts, shared local CSS/JS/JSON and inline SVG art; no CDN assets are needed. Store interactions remain available when the analytics API is down, with the SDK’s existing silent-failure behavior.
+`DEMO_API_URL` defaults to `http://localhost:5000` only for local builds. Netlify and production builds require a public HTTPS origin and fail on missing or invalid values. Its value must be an HTTP(S) origin without credentials, query, hash or path. It rewrites both tracker attributes and the restrictive meta CSP. The site uses system fonts, shared local CSS/JS/JSON and inline SVG art; no CDN assets are needed. Store interactions remain available when the analytics API is down, with the SDK’s existing silent-failure behavior.
 
 ## Traffic simulator
 
@@ -366,30 +366,17 @@ The API initializes indexes before listening. Sessions are aggregated from event
 - [ ] Verify loading, empty, and failed requests show clear state messages. Browser QA scripts exercise these with delayed/intercepted responses.
 - [ ] In a private window, verify hosted demo → hosted dashboard in Chrome and Firefox after deployment.
 
-## Deployment — MANUAL STEPS
+## Production deployment
 
-No accounts were created, credentials entered, remote repository pushed, or hosted applications deployed. Follow the guide's dependency order:
+The current architecture is MongoDB Atlas, Render for the API, and two separate Netlify projects. Use the existing GitHub repository and `main` branch; do not recreate the repository or commit credentials.
 
-1. **Create a public GitHub repository and push.** From this repository: `git remote add origin <public-repo-url>` then `git push -u origin main`. Source, lockfiles, committed tracker, and this README are ready. Update the link table after publication. Do not push `.env` or credentials.
-2. **MongoDB Atlas:** create a free M0 cluster and database user. Under Network Access allow `0.0.0.0/0` as in the guide (Render free tier has no fixed IP). Copy the connection string with database name `insightflow`, using the user's encoded password. Keep it only in local environment/Render secrets.
-3. **Seed production data** from `apps/api` using the Atlas URI and planned demo URL:
+- Store: `https://insightflow-store.netlify.app`
+- API: `https://insightflow-api-re52.onrender.com`
+- Dashboard: use its actual assigned URL; it is not recorded here.
 
-   ```bash
-   MONGODB_URI='<atlas-uri>' DEMO_ORIGINS='https://<your-demo>.vercel.app,http://localhost:5174' npm run seed
-   ```
+See [Netlify deployment and verification](docs/NETLIFY_DEPLOYMENT.md) for exact settings, environment-variable scopes, Pretty URLs, safe seeding, commit verification and password rotation. Both frontend projects publish `dist`; the store must stop publishing the source directory `.`. The store's build-info endpoint records its API origin and source commit. A Git push is not proof of a successful published deploy.
 
-   No deployment URL exists yet; substitute your actual planned/assigned URL. Rerun this after the demo URL is known. It updates allowed origins and inserts only missing historical seed events; add `-- --reset` only if deleting existing demo events is intended. Seed URLs use the first origin.
-
-4. **Render API:** create a Web Service from the GitHub repo. Root Directory `apps/api`; guide Build Command `npm install`; Start Command `npm start`; Health Check Path `/api/health`. The included `render.yaml` uses reproducible `npm ci --omit=dev`, equivalent for this runtime, and needs no cross-directory SDK build.
-
-   Set `MONGODB_URI=<atlas-uri>`, `NODE_ENV=production`, `NODE_VERSION=20`, `TRUST_PROXY=1`, and temporary `DASHBOARD_ORIGIN=http://localhost:5173`. Render supplies `PORT` (blueprint defaults to 10000). `DEMO_ORIGINS` is used when running seed locally, not during API requests. Confirm `https://<api>.onrender.com/api/health` and `/sdk/tracker.js` load; the tracker response must include `Cross-Origin-Resource-Policy: cross-origin`.
-
-5. **Vercel dashboard:** import the same repo with Root Directory `apps/dashboard`, framework Vite, Install Command `npm ci`, Build Command `npm run build`, Output Directory `dist`. Set `VITE_API_URL=https://<api>.onrender.com` before building. The project contains `vercel.json` with build/output settings. No authentication tokens belong in `VITE_` variables.
-6. **Vercel demo:** create a second project with Root Directory `apps/demo-site`, framework Other, Install Command `npm ci`, Build Command `npm run build`, Output Directory `.`. Set **`DEMO_API_URL=https://<api>.onrender.com`** before building. The generator writes the identical tracker `src`, `data-api-url`, and CSP API origin into all 15 pages automatically. Do not hand-edit generated HTML. The included `vercel.json` preserves `.html` URLs (`cleanUrls: false`) to match tracked and seeded paths. Playwright is a development tool; Vercel does not need to install a browser or run simulation.
-7. **Connect origins:** set Render `DASHBOARD_ORIGIN` to the exact dashboard Vercel origin (optionally comma-separate `http://localhost:5173`). Rerun production seed with the actual demo Vercel URL first in `DEMO_ORIGINS`, so page URLs and allowed Origins match. Redeploy/restart affected services after environment changes.
-8. **Verify hosted flow:** visit the hosted demo, click/scroll/navigate, find the new session and ordered events in the hosted dashboard, and inspect heatmap dots. Check both Chrome and Firefox/private windows. Update live links and submission notes only after seeing it work.
-
-`render.yaml` and both `vercel.json` files are configuration preparation; actual provider deployment is **unverified** until the human performs these steps.
+Set the store's `DEMO_API_URL` and dashboard's `VITE_API_URL` to the Render origin at build time. Set Render's `DASHBOARD_ORIGIN` to the actual dashboard origin, and seed with `DEMO_ORIGINS=https://insightflow-store.netlify.app,http://localhost:5174` without `--reset`. The first production-origin seed adds historical sessions while preserving existing tracked events.
 
 ## Troubleshooting
 

@@ -1,6 +1,8 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, copyFile, rm, readdir } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { isIP } from 'node:net';
 import { fileURLToPath } from 'node:url';
-import { resolve } from 'node:path';
+import { resolve, relative } from 'node:path';
 import { productArt } from '../js/art.js';
 import { money } from '../js/cart.js';
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -70,25 +72,114 @@ const checkout = `<section class="wrap section"><p class="eyebrow">One last step
 const confirmation = `<section class="wrap section confirmation"><p class="success-mark" aria-hidden="true">✓</p><p class="eyebrow">All set · Demo order</p><h1>A little good is on its way.</h1><p>Thanks for exploring Northwind. No actual order was placed and no payment was taken.</p><p id="order-number">Demo order number: NW-DEMO</p>${buttonLink('/shop.html', 'Keep exploring', true)}${buttonLink('/', 'Back home')}</section>`;
 const about = `<section class="wrap section prose"><p class="eyebrow">Our fictional story</p><h1>For a life well lived,<br>one small thing at a time.</h1><p class="lead">Northwind Goods is a made-up shop with a simple idea: the everyday deserves a little care.</p><h2>Fewer things, chosen thoughtfully.</h2><p>From a quiet morning cup to a bag that follows you everywhere, useful objects become familiar companions. Our collection brings together soft colors, thoughtful shapes, and practical details.</p><h2>A store with a purpose.</h2><p>This experience demonstrates InsightFlow Analytics. Browsing, comparing, and adding products creates real click and page-view events. Every product, review, and order is fictional.</p><h2>Nothing to buy. Plenty to explore.</h2><p>There are no payments or personal data forms. Wander through the collection and see your journey in the analytics dashboard.</p>${buttonLink('/shop.html', 'Find your favorite', true)}</section>`;
 const contact = `<section class="wrap section prose"><p class="eyebrow">A friendly hello</p><h1>Let’s keep it simple.</h1><p>This is a demo contact page. Please do not enter real personal information. The fixed values below are not sent or stored.</p><form id="contact-form" class="checkout-form"><label for="contact-email">Fictional email</label><input id="contact-email" value="shopper@example.invalid" readonly><label for="contact-topic">Demo topic</label><select id="contact-topic"><option>Product details</option><option>Fictional delivery</option><option>Demo returns</option></select><label for="contact-message">Fictional message</label><textarea id="contact-message" readonly>Hello, I am exploring this fictional store.</textarea><button class="primary">Preview demo message</button></form><h2>Questions about the demo?</h2><p>The store is static HTML and vanilla JavaScript. Your bag stays in this browser. Nothing here sends an order or a message.</p>${buttonLink('/about.html', 'About this store')}</section>`;
-export async function build({
-  output = root,
-  apiUrl = process.env.DEMO_API_URL || 'http://localhost:5000',
-} = {}) {
-  const api = new URL(apiUrl);
+export const productionBuild = () =>
+  process.env.NETLIFY === 'true' ||
+  process.env.CONTEXT === 'production' ||
+  process.env.NODE_ENV === 'production';
+export function apiOrigin(apiUrl, production = productionBuild()) {
+  if (apiUrl === undefined && !production) apiUrl = 'http://localhost:5000';
+  let api;
+  try {
+    api = new URL(apiUrl);
+  } catch {
+    throw new Error('DEMO_API_URL is required and must be a valid public API origin');
+  }
   if (
     !['http:', 'https:'].includes(api.protocol) ||
     api.username ||
     api.password ||
     api.pathname !== '/' ||
     api.search ||
-    api.hash
+    api.hash ||
+    api.origin !== apiUrl
   )
     throw new Error(
       'DEMO_API_URL must be an HTTP(S) origin without credentials, path, query, or fragment',
     );
-  const products = JSON.parse(
-    await readFile(new URL('../data/products.json', import.meta.url), 'utf8'),
-  );
+  if (
+    production &&
+    (api.protocol !== 'https:' ||
+      isIP(api.hostname.replace(/^\[|\]$/g, '')) ||
+      !api.hostname.includes('.') ||
+      /(^|\.)(localhost|local|internal|invalid|test|example)$/.test(api.hostname) ||
+      /(^|[.-])(example|placeholder|your-api|your-backend)([.-]|$)/.test(api.hostname))
+  )
+    throw new Error(
+      'Production DEMO_API_URL must be an HTTPS origin with a public, non-placeholder hostname',
+    );
+  return api.origin;
+}
+const assets = ['style.css', 'js/store.js', 'js/cart.js', 'js/art.js', 'data/products.json'];
+async function readProducts() {
+  return JSON.parse(await readFile(new URL('../data/products.json', import.meta.url), 'utf8'));
+}
+export async function verifyBuild({ output, apiUrl, production = productionBuild() }) {
+  const origin = apiOrigin(apiUrl, production);
+  const products = await readProducts();
+  const pages = [
+    'index.html',
+    'shop.html',
+    'cart.html',
+    'checkout.html',
+    'order-confirmation.html',
+    'about.html',
+    'contact.html',
+    ...products.map((p) => `products/${p.slug}.html`),
+  ];
+  const expected = new Set([...pages, ...assets, 'build-info.json']);
+  const entries = await readdir(output, { recursive: true, withFileTypes: true });
+  if (
+    entries.some(
+      (entry) =>
+        !entry.isFile() &&
+        (!entry.isDirectory() ||
+          !['js', 'data', 'products'].includes(
+            relative(output, resolve(entry.parentPath, entry.name)),
+          )),
+    )
+  )
+    throw new Error('Build output contains unexpected directories or symbolic links');
+  const files = entries
+    .filter((entry) => entry.isFile())
+    .map((entry) => relative(output, resolve(entry.parentPath, entry.name)));
+  if (files.length !== expected.size || files.some((file) => !expected.has(file)))
+    throw new Error('Build output contains missing or unexpected deployable files');
+  for (const path of pages) {
+    const html = await readFile(resolve(output, path), 'utf8');
+    if (
+      !html.includes(
+        `<script async src="${origin}/sdk/tracker.js" data-site-id="demo_store" data-api-url="${origin}/api/events"></script>`,
+      ) ||
+      (html.match(/\/sdk\/tracker\.js/g) || []).length !== 1 ||
+      !html.includes(`script-src 'self' ${origin};`) ||
+      !html.includes(`connect-src 'self' ${origin};`) ||
+      (production && /localhost|127\.0\.0\.1|\{\{[A-Z_]+\}\}/.test(html))
+    )
+      throw new Error(`Generated tracker or CSP verification failed for ${path}`);
+    for (const [, link] of html.matchAll(/(?:href|src)="(\/[^"?#]*)"/g)) {
+      if (!expected.has(link === '/' ? 'index.html' : link.slice(1)))
+        throw new Error(`Generated page has an unresolved local link: ${path}`);
+    }
+  }
+  return pages;
+}
+export async function build({
+  output = resolve(root, 'dist'),
+  apiUrl = process.env.DEMO_API_URL,
+  production = productionBuild(),
+} = {}) {
+  const origin = apiOrigin(apiUrl, production);
+  output = resolve(output);
+  const sourceRelative = relative(root, output);
+  if (
+    !relative(output, root).startsWith('..') ||
+    (!sourceRelative.startsWith('..') && sourceRelative !== 'dist')
+  )
+    throw new Error(
+      'Build output must be dist or a separate temporary directory, never source files',
+    );
+  await rm(output, { recursive: true, force: true });
+  const products = await readProducts();
   const template = await readFile(new URL('../templates/page.html', import.meta.url), 'utf8');
   const pages = [
     ['index.html', 'Home', home(products), 'home'],
@@ -105,13 +196,13 @@ export async function build({
       'product',
     ]),
   ];
-  const tracker = `<script async src="${api.origin}/sdk/tracker.js" data-site-id="demo_store" data-api-url="${api.origin}/api/events"></script>`;
+  const tracker = `<script async src="${origin}/sdk/tracker.js" data-site-id="demo_store" data-api-url="${origin}/api/events"></script>`;
   for (const [filename, title, content, page] of pages) {
     const values = {
       TITLE: escapeHtml(title),
       CONTENT: content,
       PAGE: page,
-      API_ORIGIN: api.origin,
+      API_ORIGIN: origin,
       TRACKER: tracker,
     };
     await mkdir(resolve(output, filename, '..'), { recursive: true });
@@ -120,13 +211,33 @@ export async function build({
       template.replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => values[key]),
     );
   }
-  return pages.map(([filename]) => filename);
+  for (const asset of assets) {
+    await mkdir(resolve(output, asset, '..'), { recursive: true });
+    await copyFile(resolve(root, asset), resolve(output, asset));
+  }
+  let commit = process.env.COMMIT_REF;
+  if (!commit) {
+    try {
+      commit = execFileSync('git', ['rev-parse', 'HEAD'], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+      }).trim();
+    } catch {
+      commit = null;
+    }
+  }
+  await writeFile(
+    resolve(output, 'build-info.json'),
+    JSON.stringify({ commit, apiOrigin: origin, pages: pages.length }, null, 2) + '\n',
+  );
+  return verifyBuild({ output, apiUrl: origin, production });
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
     const pages = await build();
     console.log(
-      `Built ${pages.length} Northwind pages; tracker API ${process.env.DEMO_API_URL || 'http://localhost:5000'}`,
+      `Built and verified ${pages.length} Northwind pages in dist; public tracker API ${apiOrigin(process.env.DEMO_API_URL)}`,
     );
   } catch (error) {
     console.error(error.message);

@@ -1,14 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, mkdtemp, rm } from 'node:fs/promises';
+import { readFile, mkdtemp, rm, writeFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { build } from '../scripts/build.js';
+import { tmpdir } from 'node:os';
+import { spawnSync } from 'node:child_process';
+import { build, apiOrigin, verifyBuild } from '../scripts/build.js';
 import { addItem, setQuantity, totals, validateCart, loadCart, cartKey } from '../js/cart.js';
 const products = JSON.parse(await readFile(new URL('../data/products.json', import.meta.url)));
 test('generator creates all 15 pages with identical tracker and strict CSP', async () => {
-  const output = await mkdtemp(new URL('../../../.cache/generator-', import.meta.url));
+  const output = await mkdtemp(join(tmpdir(), 'insightflow-generator-'));
   try {
-    const paths = await build({ output, apiUrl: 'https://api.example.invalid' });
+    const paths = await build({ output, apiUrl: 'https://api.example.invalid', production: false });
     assert.equal(paths.length, 15);
     for (const product of products) assert(paths.includes(`products/${product.slug}.html`));
     for (const path of paths) {
@@ -24,11 +26,98 @@ test('generator creates all 15 pages with identical tracker and strict CSP', asy
     }
     const shop = await readFile(join(output, 'shop.html'), 'utf8');
     for (const product of products) assert(shop.includes(`/products/${product.slug}.html`));
-    await build({ output });
+    await build({ output, apiUrl: 'http://localhost:5000', production: false });
     assert(
       (await readFile(join(output, 'index.html'), 'utf8')).includes(
         'http://localhost:5000/sdk/tracker.js',
       ),
+    );
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+const productionApi = 'https://insightflow-api-re52.onrender.com';
+test('production rejects missing, local, insecure, malformed and placeholder origins', () => {
+  for (const value of [
+    undefined,
+    '',
+    ' ',
+    'not-a-url',
+    'http://insightflow-api-re52.onrender.com',
+    'https://localhost:5000',
+    'http://localhost:5000',
+    'https://127.0.0.1',
+    'https://[::1]',
+    'https://api.example.invalid',
+    'https://your-api.onrender.com',
+    'https://example.com',
+    'https://user:password@api.company.com',
+    productionApi + '/',
+    productionApi + '/api/events',
+    productionApi + '?key=x',
+    productionApi + '#fragment',
+  ])
+    assert.throws(() => apiOrigin(value, true));
+  assert.equal(apiOrigin(productionApi, true), productionApi);
+  assert.equal(apiOrigin(undefined, false), 'http://localhost:5000');
+});
+test('Netlify CLI build fails instead of silently falling back when its variable is missing or empty', () => {
+  const env = { ...process.env, NETLIFY: 'true' };
+  delete env.DEMO_API_URL;
+  for (const missing of [env, { ...env, DEMO_API_URL: '' }]) {
+    const result = spawnSync(process.execPath, ['scripts/build.js'], {
+      cwd: new URL('../', import.meta.url),
+      env: missing,
+      encoding: 'utf8',
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /DEMO_API_URL/);
+    assert(!result.stdout.includes('Built and verified'));
+  }
+});
+test('production output contains exactly 15 valid pages and required assets, removes stale files, and detects corruption', async () => {
+  const output = await mkdtemp(join(tmpdir(), 'insightflow-production-'));
+  try {
+    await writeFile(join(output, 'stale.html'), 'localhost');
+    const paths = await build({ output, apiUrl: productionApi, production: true });
+    assert.equal(paths.length, 15);
+    const files = (await readdir(output, { recursive: true, withFileTypes: true })).filter(
+      (entry) => entry.isFile(),
+    );
+    assert.equal(files.length, 21);
+    for (const path of paths) {
+      const html = await readFile(join(output, path), 'utf8');
+      assert(html.includes(`src="${productionApi}/sdk/tracker.js"`));
+      assert(html.includes(`data-api-url="${productionApi}/api/events"`));
+      assert(html.includes('data-site-id="demo_store"'));
+      assert(html.includes(`script-src 'self' ${productionApi};`));
+      assert(html.includes(`connect-src 'self' ${productionApi};`));
+      assert(!/localhost|127\.0\.0\.1/.test(html));
+      for (const [, link] of html.matchAll(/href="(\/products\/[^"#?]+\.html)"/g))
+        assert(paths.includes(link.slice(1)), `Unresolved product link in ${path}`);
+    }
+    for (const asset of [
+      'style.css',
+      'js/store.js',
+      'js/cart.js',
+      'js/art.js',
+      'data/products.json',
+    ])
+      assert.deepEqual(
+        await readFile(join(output, asset)),
+        await readFile(new URL('../' + asset, import.meta.url)),
+      );
+    const html = await readFile(join(output, 'index.html'), 'utf8');
+    await writeFile(
+      join(output, 'index.html'),
+      html.replace(productionApi, 'http://localhost:5000'),
+    );
+    await assert.rejects(verifyBuild({ output, apiUrl: productionApi, production: true }));
+    await build({ output, apiUrl: productionApi, production: true });
+    await writeFile(join(output, '.env'), 'unexpected-file');
+    await assert.rejects(verifyBuild({ output, apiUrl: productionApi, production: true }));
+    await assert.rejects(
+      verifyBuild({ output, apiUrl: 'http://localhost:5000', production: true }),
     );
   } finally {
     await rm(output, { recursive: true, force: true });
