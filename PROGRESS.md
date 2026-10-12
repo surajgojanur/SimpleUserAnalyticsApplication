@@ -69,3 +69,11 @@ Next: phase 5 quality review, dependency advisories, lint, and secret/history ch
 - Strengthened browser verification checks exact event-count cell, rendered timestamps/types, alternate page URL selection, and rejects all unexpected console errors. Rerun after seed/formatting: passed.
 
 Next: phase 6 README and deployment notes, followed by a real fresh clone inside verification/fresh-clone (ignored).
+
+## Phase 6 completed
+- README includes full setup, independent packages, env variables, rebuild/embed, endpoint examples/errors/ordering/limits, data models/index rationale, tests/browser QA, assumptions, manual checklist, known limitations, future work, troubleshooting, and guide corrections.
+- Deployment order follows guide: public GitHub → Atlas → production seed → Render → Vercel dashboard → Vercel demo → connect origins → hosted verification. All account/credential/publication/hosting work clearly marked MANUAL STEPS; no hosted claims.
+- render.yaml prepared with apps/api root, npm ci --omit=dev, npm start, health route, Node 20, production, proxy trust, and manual environment inputs. README also states guide's npm install command. Vercel config preserves demo .html paths.
+- Parsed both Vercel JSON files, checked README coverage, lint and diff whitespace checks passed. Provider deployments are not executed and cannot be claimed validated.
+
+Next: phase 7 fresh clone into verification/fresh-clone. Stop original service processes to avoid port collisions. Follow README commands only, using existing local MongoDB; install all packages with npm ci from their own directories, seed, run services, smoke/tests/build/lint, tracker/browser QA. Record actual results and fixes.
